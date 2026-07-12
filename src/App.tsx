@@ -26,7 +26,7 @@ type ScreenId =
   | 'wombats'
   | 'dossier';
 
-type BootPhase = 'flicker' | 'display' | 'loading' | 'ready';
+type BootPhase = 'flicker' | 'display' | 'loading' | 'granted' | 'ready';
 
 type Dossier = {
   id: string;
@@ -135,6 +135,7 @@ const LOCK_DURATION_MS = 380;
 const BOOT_FLICKER_DURATION_MS = 1150;
 const BOOT_DISPLAY_DURATION_MS = 1400;
 const BOOT_LOADING_DURATION_MS = 2800;
+const BOOT_GRANTED_DURATION_MS = 1000;
 const LAYOUT_STORAGE_KEY = 'dars-1a-layout-adjustments-v2';
 const PROTECTED_LAYOUT_ASSET_IDS = [
   'buttonMenu',
@@ -734,12 +735,25 @@ function App() {
         return;
       }
 
-      setBootPhase('ready');
+      setBootPhase('granted');
     };
 
     frameId = window.requestAnimationFrame(step);
 
     return () => window.cancelAnimationFrame(frameId);
+  }, [bootPhase]);
+
+  useEffect(() => {
+    if (bootPhase !== 'granted') {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(
+      () => setBootPhase('ready'),
+      BOOT_GRANTED_DURATION_MS,
+    );
+
+    return () => window.clearTimeout(timerId);
   }, [bootPhase]);
 
   useEffect(() => {
@@ -1917,10 +1931,18 @@ function BootScreen({
     return null;
   }
 
-  if (phase === 'display') {
+  if (phase === 'display' || phase === 'granted') {
+    const isGranted = phase === 'granted';
+
     return (
-      <div className="crt-boot crt-boot--display">
-        <span className="crt-boot__display-text">DISPLAY INITIALIZING</span>
+      <div
+        className={`crt-boot crt-boot--display${
+          isGranted ? ' crt-boot--granted' : ''
+        }`}
+      >
+        <span className="crt-boot__display-text">
+          {isGranted ? 'ACCESS GRANTED' : 'DISPLAY INITIALIZING'}
+        </span>
       </div>
     );
   }

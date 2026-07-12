@@ -1016,6 +1016,32 @@ button {
   }
 }
 
+/* --- ACCESS GRANTED: affirmative flash-in, no lingering flicker --- */
+
+.crt-boot--granted .crt-boot__display-text {
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  text-shadow:
+    0 0 10px rgba(101, 255, 47, 0.9),
+    0 0 22px rgba(101, 255, 47, 0.5);
+
+  animation: crt-boot-granted-in 420ms ease both;
+}
+
+@keyframes crt-boot-granted-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* --- Screen 2: INITIALIZING D.A.R.S. --- */
 
 .crt-boot--loading {
@@ -1231,6 +1257,14 @@ button {
   align-content: center;
   justify-items: center;
   gap: 4.5%;
+
+  /*
+   * The home menu fills the whole CRT (crt-browser inset: 0), so pad it
+   * into the safe band between the header plate (top) and the warning
+   * footer (bottom). Mirrors where the calibrated screens sit — title
+   * line at ~27%, panel bottoms at ~93%. Tune these to taste.
+   */
+  padding: 24% 6% 16%;
 
   text-align: center;
 }
