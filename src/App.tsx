@@ -26,6 +26,8 @@ type ScreenId =
   | 'wombats'
   | 'dossier';
 
+type BootPhase = 'flicker' | 'display' | 'loading' | 'ready';
+
 type Dossier = {
   id: string;
   name: string;
@@ -79,6 +81,23 @@ const OBJECT_OPTIONS = [
   'Leggings',
 ] as const;
 
+type BootTask = {
+  label: string;
+  start: number;
+  end: number;
+};
+
+/*
+ * Each task fills its bar between `start` and `end` on the overall
+ * 0..1 boot-loading progress. The ranges overlap so more than one bar
+ * is visibly filling at a time, matching the reference boot screen.
+ */
+const BOOT_TASKS: BootTask[] = [
+  { label: 'ARCHIVE HANDSHAKE', start: 0, end: 0.42 },
+  { label: 'LOADING INTERFACE MODULES', start: 0.28, end: 0.74 },
+  { label: 'VERIFYING CREDENTIALS', start: 0.6, end: 1 },
+];
+
 const ASSET_ROOT = '/assets/dars';
 
 const ASSETS = {
@@ -114,6 +133,8 @@ const UNLOCK_DURATION_MS = 380;
 const DOOR_DURATION_MS = 600;
 const LOCK_DURATION_MS = 380;
 const BOOT_FLICKER_DURATION_MS = 1150;
+const BOOT_DISPLAY_DURATION_MS = 1400;
+const BOOT_LOADING_DURATION_MS = 2800;
 const LAYOUT_STORAGE_KEY = 'dars-1a-layout-adjustments-v2';
 const PROTECTED_LAYOUT_ASSET_IDS = [
   'buttonMenu',
@@ -264,7 +285,8 @@ function App() {
     useState<SelectionRect | null>(null);
   const [copyStatus, setCopyStatus] = useState('');
   const [screen, setScreen] = useState<ScreenId>('home');
-  const [isBooting, setIsBooting] = useState(true);
+  const [bootPhase, setBootPhase] = useState<BootPhase>('flicker');
+  const [bootProgress, setBootProgress] = useState(0);
   const [selectedDossierId, setSelectedDossierId] = useState<string | null>(
     null,
   );
@@ -677,13 +699,48 @@ function App() {
   }, [clearTimers]);
 
   useEffect(() => {
-    const timerId = window.setTimeout(
-      () => setIsBooting(false),
-      BOOT_FLICKER_DURATION_MS,
-    );
+    const timers = [
+      window.setTimeout(
+        () => setBootPhase('display'),
+        BOOT_FLICKER_DURATION_MS,
+      ),
+      window.setTimeout(
+        () => setBootPhase('loading'),
+        BOOT_FLICKER_DURATION_MS + BOOT_DISPLAY_DURATION_MS,
+      ),
+    ];
 
-    return () => window.clearTimeout(timerId);
+    return () => timers.forEach((timerId) => window.clearTimeout(timerId));
   }, []);
+
+  useEffect(() => {
+    if (bootPhase !== 'loading') {
+      return undefined;
+    }
+
+    let frameId = 0;
+    let startTime = 0;
+
+    const step = (now: number) => {
+      if (!startTime) {
+        startTime = now;
+      }
+
+      const progress = Math.min(1, (now - startTime) / BOOT_LOADING_DURATION_MS);
+      setBootProgress(progress);
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(step);
+        return;
+      }
+
+      setBootPhase('ready');
+    };
+
+    frameId = window.requestAnimationFrame(step);
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [bootPhase]);
 
   useEffect(() => {
     if (bayState !== 'closed' || !pendingNavigation) {
@@ -1049,7 +1106,7 @@ function App() {
             <div
               ref={(node) => setLayoutNode('crt', node)}
               className={`crt-screen layout-editable${
-                isBooting ? ' crt-screen--booting' : ''
+                bootPhase === 'flicker' ? ' crt-screen--booting' : ''
               }`}
               style={getScaleStyle('crt')}
               data-layout-id="crt"
@@ -1058,7 +1115,7 @@ function App() {
               <div className="crt-base-glow" />
               <div className="crt-scanlines" />
               <div className="crt-content">
-                {!isBooting && (
+                {bootPhase === 'ready' ? (
                   <DossierBrowser
                     screen={screen}
                     dossiers={DOSSIERS}
@@ -1075,6 +1132,8 @@ function App() {
                     onOpenWombats={() => navigateToScreen('wombats')}
                     onOpenDossier={openDossier}
                   />
+                ) : (
+                  <BootScreen phase={bootPhase} progress={bootProgress} />
                 )}
               </div>
               <img
@@ -1842,6 +1901,79 @@ function CrtEditableBlock({
         onPointerDown={(event) => beginMove(event, assetId)}
       >
         {children}
+      </div>
+    </div>
+  );
+}
+
+function BootScreen({
+  phase,
+  progress,
+}: {
+  phase: BootPhase;
+  progress: number;
+}) {
+  if (phase === 'flicker') {
+    return null;
+  }
+
+  if (phase === 'display') {
+    return (
+      <div className="crt-boot crt-boot--display">
+        <span className="crt-boot__display-text">DISPLAY INITIALIZING</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="crt-boot crt-boot--loading">
+      <div className="crt-boot__title">INITIALIZING D.A.R.S.</div>
+
+      <div className="crt-boot__tasks">
+        {BOOT_TASKS.map((task) => {
+          const span = Math.max(0.0001, task.end - task.start);
+          const fill = Math.min(
+            1,
+            Math.max(0, (progress - task.start) / span),
+          );
+          const isDone = fill >= 1;
+          const isActive = fill > 0 && !isDone;
+
+          return (
+            <div className="crt-boot__task" key={task.label}>
+              <div className="crt-boot__task-line">
+                <span>&gt; {task.label}</span>
+                <span className="crt-boot__task-status">
+                  {isDone
+                    ? '[ OK ]'
+                    : isActive
+                      ? `[ ${Math.round(fill * 100)}% ]`
+                      : '.....'}
+                </span>
+              </div>
+              <div className="crt-boot__bar">
+                <span
+                  className="crt-boot__bar-fill"
+                  style={{ width: `${fill * 100}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="crt-boot__footer">
+        <div className="crt-boot__status-box">
+          STATUS: AUTHENTICATION IN PROGRESS
+        </div>
+
+        <div className="crt-boot__standby">PLEASE STAND BY</div>
+
+        <div className="crt-boot__dots" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
     </div>
   );

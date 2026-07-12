@@ -956,6 +956,215 @@ button {
   }
 }
 
+/* =========================================================
+   BOOT SEQUENCE
+   flicker -> DISPLAY INITIALIZING -> loading bars -> menu
+   ========================================================= */
+
+.crt-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+
+  color: var(--phosphor);
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+@keyframes crt-boot-text-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Screen 1: DISPLAY INITIALIZING --- */
+
+.crt-boot--display {
+  align-items: center;
+  justify-content: center;
+}
+
+.crt-boot__display-text {
+  display: inline-block;
+
+  font-size: clamp(0.62rem, 1.9vw, 1.05rem);
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+
+  animation:
+    crt-boot-text-in 480ms ease both,
+    crt-boot-text-flicker 2.6s steps(1, end) 480ms infinite;
+}
+
+@keyframes crt-boot-text-flicker {
+  0%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.5;
+  }
+  97% {
+    opacity: 1;
+  }
+}
+
+/* --- Screen 2: INITIALIZING D.A.R.S. --- */
+
+.crt-boot--loading {
+  justify-content: space-between;
+  gap: 3%;
+
+  padding: 1% 0;
+
+  font-size: clamp(6px, 1.4vw, 11px);
+  letter-spacing: 0.12em;
+
+  animation: crt-boot-text-in 320ms ease both;
+}
+
+.crt-boot__title {
+  font-size: 1.5em;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+}
+
+.crt-boot__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+}
+
+.crt-boot__task {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+}
+
+.crt-boot__task-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8em;
+
+  letter-spacing: 0.16em;
+}
+
+.crt-boot__task-status {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.crt-boot__bar {
+  height: 1.5em;
+  padding: 0.22em;
+
+  border: 1px solid var(--phosphor);
+  box-shadow:
+    0 0 4px rgba(101, 255, 47, 0.28),
+    inset 0 0 6px rgba(0, 0, 0, 0.6);
+
+  overflow: hidden;
+}
+
+.crt-boot__bar-fill {
+  display: block;
+  height: 100%;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--phosphor) 0,
+      var(--phosphor) 0.62em,
+      transparent 0.62em,
+      transparent 0.82em
+    );
+  box-shadow: 0 0 6px rgba(101, 255, 47, 0.55);
+}
+
+.crt-boot__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5%;
+}
+
+.crt-boot__status-box {
+  width: 100%;
+  padding: 0.7em 0.5em;
+
+  text-align: center;
+  letter-spacing: 0.14em;
+
+  border: 1px solid rgba(101, 255, 47, 0.42);
+}
+
+.crt-boot__standby {
+  font-size: 1.35em;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+}
+
+.crt-boot__dots {
+  display: flex;
+  gap: 0.9em;
+}
+
+.crt-boot__dots span {
+  width: 0.55em;
+  height: 0.55em;
+
+  border-radius: 50%;
+  background: var(--phosphor);
+  box-shadow: 0 0 6px rgba(101, 255, 47, 0.6);
+}
+
+.crt-boot__dots span:nth-child(2) {
+  animation: crt-boot-dot-2 1.2s linear infinite;
+}
+
+.crt-boot__dots span:nth-child(3) {
+  animation: crt-boot-dot-3 1.2s linear infinite;
+}
+
+@keyframes crt-boot-dot-2 {
+  0%,
+  33% {
+    opacity: 0;
+  }
+  34%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes crt-boot-dot-3 {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  67%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-boot__display-text,
+  .crt-boot__dots span {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
 .crt-base-glow {
   position: absolute;
   inset: 0;
