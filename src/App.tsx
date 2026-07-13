@@ -112,8 +112,6 @@ const ASSETS = {
   doorUpper: `${ASSET_ROOT}/door_upper.png`,
   doorLower: `${ASSET_ROOT}/door_lower.png`,
   bayLatch: `${ASSET_ROOT}/bay_latch.png`,
-  darsHeader: `${ASSET_ROOT}/dars_header.png`,
-  darsSeal: `${ASSET_ROOT}/dars_seal.png`,
   buttonMenu: `${ASSET_ROOT}/button_menu.png`,
   buttonArchive: `${ASSET_ROOT}/button_archive.png`,
   buttonBack: `${ASSET_ROOT}/button_back.png`,
@@ -146,8 +144,6 @@ const PROTECTED_LAYOUT_ASSET_IDS = [
 const LAYOUT_ASSETS = [
   { id: 'crt', label: 'CRT Screen' },
   { id: 'deviceHeader', label: 'Display Header' },
-  { id: 'crtHeaderPlate', label: 'CRT Header Plate' },
-  { id: 'crtHeaderSeal', label: 'DARS Seal' },
   { id: 'warningBanner', label: 'Warning Banner' },
   { id: 'crtTitleLine', label: 'CRT Title Line' },
   { id: 'crtLeftPanel', label: 'CRT Left Panel' },
@@ -1160,35 +1156,6 @@ function App() {
               <div className="crt-reflection" />
             </div>
           </DeviceLayer>
-
-          <DeviceLayer
-            assetId="crtHeaderPlate"
-            className="layout-offset--crt-header-plate"
-            getOffsetStyle={getOffsetStyle}
-          >
-            <img
-              ref={(node) => setLayoutNode('crtHeaderPlate', node)}
-              className="crt-header-plate layout-editable"
-              style={getScaleStyle('crtHeaderPlate')}
-              data-layout-id="crtHeaderPlate"
-              src={ASSETS.darsHeader}
-              alt=""
-              aria-hidden="true"
-              draggable="false"
-              onPointerDown={(event) => beginMove(event, 'crtHeaderPlate')}
-            />
-          </DeviceLayer>
-
-          <ImageLayer
-            assetId="crtHeaderSeal"
-            wrapperClassName="layout-offset--crt-header-seal"
-            imageClassName="crt-header-seal layout-editable"
-            src={ASSETS.darsSeal}
-            getOffsetStyle={getOffsetStyle}
-            getScaleStyle={getScaleStyle}
-            setLayoutNode={setLayoutNode}
-            beginMove={beginMove}
-          />
 
           <DeviceLayer
             assetId="deviceHeader"

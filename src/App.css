@@ -1259,12 +1259,12 @@ button {
   gap: 4.5%;
 
   /*
-   * The home menu fills the whole CRT (crt-browser inset: 0), so pad it
-   * into the safe band between the header plate (top) and the warning
-   * footer (bottom). Mirrors where the calibrated screens sit — title
-   * line at ~27%, panel bottoms at ~93%. Tune these to taste.
+   * The home menu fills the whole CRT (crt-browser inset: 0). Header bar
+   * is gone, so only the thin status strip sits up top; pad enough to
+   * clear it, and keep a large bottom pad so the ENTER button + copy ride
+   * above the warning footer. Tune these two values to taste.
    */
-  padding: 24% 6% 16%;
+  padding: 12% 6% 26%;
 
   text-align: center;
 }
