@@ -160,6 +160,10 @@ const LAYOUT_ASSETS = [
   { id: 'crtLeftPanel', label: 'CRT Left Panel' },
   { id: 'crtRightTopPanel', label: 'CRT Right Top Panel' },
   { id: 'crtRightBottomPanel', label: 'CRT Right Bottom Panel' },
+  { id: 'catSpecies', label: 'Category: Species' },
+  { id: 'catArtifacts', label: 'Category: Artifacts' },
+  { id: 'catEvents', label: 'Category: Events' },
+  { id: 'catAnomalies', label: 'Category: Anomalies' },
   { id: 'rearBay', label: 'Rear Bay Group' },
   { id: 'bayCavity', label: 'Bay Cavity' },
   { id: 'bayRailLeft', label: 'Left Bay Rail' },
@@ -1719,37 +1723,76 @@ function DossierBrowser({
 
   if (screen === 'menu') {
     return (
-      <div className="crt-browser crt-category">
-        <div className="crt-category-grid">
-          <button
-            type="button"
-            className="crt-category-tile"
-            onClick={onSelectSpecies}
+      <div className="crt-browser">
+        <CrtEditableBlock
+          assetId="crtTitleLine"
+          className="crt-title-line"
+          getOffsetStyle={getOffsetStyle}
+          getScaleStyle={getScaleStyle}
+          setLayoutNode={setLayoutNode}
+          beginMove={beginMove}
+        >
+          <span
+            className="crt-title-chevrons crt-title-chevrons--left"
+            aria-hidden="true"
           >
-            <img src={ASSETS.speciesBadge} alt="Species" draggable="false" />
-          </button>
-          <button
-            type="button"
-            className="crt-category-tile"
-            onClick={onSelectObjects}
+            <i />
+            <i />
+          </span>
+          <strong>SELECT CATEGORY</strong>
+          <span
+            className="crt-title-chevrons crt-title-chevrons--right"
+            aria-hidden="true"
           >
-            <img src={ASSETS.artifactBadge} alt="Artifacts" draggable="false" />
-          </button>
-          <button
-            type="button"
-            className="crt-category-tile"
-            onClick={onSelectEvents}
-          >
-            <img src={ASSETS.eventBadge} alt="Events" draggable="false" />
-          </button>
-          <button
-            type="button"
-            className="crt-category-tile"
-            onClick={onSelectAnomalies}
-          >
-            <img src={ASSETS.anomalyBadge} alt="Anomalies" draggable="false" />
-          </button>
-        </div>
+            <i />
+            <i />
+          </span>
+        </CrtEditableBlock>
+
+        <CategoryBadge
+          assetId="catSpecies"
+          className="cat-badge cat-badge--species"
+          src={ASSETS.speciesBadge}
+          label="Species"
+          onClick={onSelectSpecies}
+          getOffsetStyle={getOffsetStyle}
+          getScaleStyle={getScaleStyle}
+          setLayoutNode={setLayoutNode}
+          beginMove={beginMove}
+        />
+        <CategoryBadge
+          assetId="catArtifacts"
+          className="cat-badge cat-badge--artifacts"
+          src={ASSETS.artifactBadge}
+          label="Artifacts"
+          onClick={onSelectObjects}
+          getOffsetStyle={getOffsetStyle}
+          getScaleStyle={getScaleStyle}
+          setLayoutNode={setLayoutNode}
+          beginMove={beginMove}
+        />
+        <CategoryBadge
+          assetId="catEvents"
+          className="cat-badge cat-badge--events"
+          src={ASSETS.eventBadge}
+          label="Events"
+          onClick={onSelectEvents}
+          getOffsetStyle={getOffsetStyle}
+          getScaleStyle={getScaleStyle}
+          setLayoutNode={setLayoutNode}
+          beginMove={beginMove}
+        />
+        <CategoryBadge
+          assetId="catAnomalies"
+          className="cat-badge cat-badge--anomalies"
+          src={ASSETS.anomalyBadge}
+          label="Anomalies"
+          onClick={onSelectAnomalies}
+          getOffsetStyle={getOffsetStyle}
+          getScaleStyle={getScaleStyle}
+          setLayoutNode={setLayoutNode}
+          beginMove={beginMove}
+        />
       </div>
     );
   }
@@ -1927,6 +1970,54 @@ function CrtEditableBlock({
       >
         {children}
       </div>
+    </div>
+  );
+}
+
+function CategoryBadge({
+  assetId,
+  className,
+  src,
+  label,
+  onClick,
+  getOffsetStyle,
+  getScaleStyle,
+  setLayoutNode,
+  beginMove,
+}: {
+  assetId: Extract<
+    LayoutAssetId,
+    'catSpecies' | 'catArtifacts' | 'catEvents' | 'catAnomalies'
+  >;
+  className: string;
+  src: string;
+  label: string;
+  onClick: () => void;
+  getOffsetStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
+  getScaleStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
+  setLayoutNode: (assetId: LayoutAssetId, node: HTMLElement | null) => void;
+  beginMove: (
+    event: ReactPointerEvent<HTMLElement>,
+    assetId: LayoutAssetId,
+  ) => void;
+}) {
+  return (
+    <div
+      className={`crt-layout-offset crt-layout-offset--${assetId}`}
+      style={getOffsetStyle(assetId)}
+    >
+      <button
+        ref={(node) => setLayoutNode(assetId, node)}
+        className={`${className} layout-editable`}
+        style={getScaleStyle(assetId)}
+        data-layout-id={assetId}
+        type="button"
+        onClick={onClick}
+        onPointerDown={(event) => beginMove(event, assetId)}
+        aria-label={label}
+      >
+        <img src={src} alt="" draggable="false" />
+      </button>
     </div>
   );
 }

@@ -1380,44 +1380,55 @@ button {
 }
 
 /* =========================================================
-   CATEGORY SELECT  (menu screen 2x2 badge grid)
+   CATEGORY SELECT  (menu screen badge tiles, layout-editable)
+
+   Each tile is an absolutely-positioned button wrapped in a
+   crt-layout-offset, so it can be dragged/scaled in the editor.
    ========================================================= */
 
-.crt-category-grid {
+.cat-badge {
   position: absolute;
-  inset: 6% 1% 22% 1%;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 3%;
-}
-
-.crt-category-tile {
-  min-width: 0;
-  min-height: 0;
+  width: 46%;
   padding: 0;
-
-  display: grid;
-  place-items: center;
 
   border: 0;
   background: transparent;
   cursor: pointer;
+
+  pointer-events: auto;
+  transform-origin: center;
 }
 
-.crt-category-tile img {
+.cat-badge--species {
+  left: 3%;
+  top: 18%;
+}
+
+.cat-badge--artifacts {
+  left: 51%;
+  top: 18%;
+}
+
+.cat-badge--events {
+  left: 3%;
+  top: 49%;
+}
+
+.cat-badge--anomalies {
+  left: 51%;
+  top: 49%;
+}
+
+.cat-badge img {
   /*
-   * Source badges read yellow-green; nudge their hue toward the CRT
-   * phosphor (~+22deg). Raise the angle for greener, set to none for the
-   * original lime.
+   * Source badges read yellow-green; nudge hue toward the CRT phosphor.
+   * Raise the angle for greener, set to none for the original lime.
    */
-  --badge-tint: hue-rotate(22deg) saturate(1.05);
+  --badge-tint: hue-rotate(30deg) saturate(1.08);
 
-  max-width: 100%;
-  max-height: 100%;
-
-  object-fit: contain;
+  display: block;
+  width: 100%;
+  height: auto;
 
   filter: var(--badge-tint);
 
@@ -1429,16 +1440,20 @@ button {
     filter 120ms ease;
 }
 
-.crt-category-tile:hover img {
+.cat-badge:hover img {
   transform: scale(1.03);
   filter:
     var(--badge-tint)
-    brightness(1.12)
-    drop-shadow(0 0 7px rgba(101, 255, 47, 0.55));
+    brightness(1.1)
+    drop-shadow(0 0 8px rgba(101, 255, 47, 0.55));
 }
 
-.crt-category-tile:active img {
+.cat-badge:active img {
   transform: scale(0.98);
+}
+
+.layout-editing .cat-badge:active img {
+  transform: none;
 }
 
 .crt-layout-offset {
