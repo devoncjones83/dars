@@ -1397,7 +1397,7 @@ button {
 
 .crt-title-line {
   left: -9%;
-  top: 27%;
+  top: 12%;
   width: 118%;
   min-height: 5.7%;
 
@@ -1479,21 +1479,21 @@ button {
 
 .crt-panel--left {
   left: 0;
-  top: 37%;
+  top: 22%;
   width: 49%;
   height: 56%;
 }
 
 .crt-panel--right-top {
   left: 52%;
-  top: 37%;
+  top: 22%;
   width: 48%;
   height: 25.5%;
 }
 
 .crt-panel--right-bottom {
   left: 52%;
-  top: 67.5%;
+  top: 52.5%;
   width: 48%;
   height: 25.5%;
 }

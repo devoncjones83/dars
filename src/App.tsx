@@ -1691,7 +1691,7 @@ function DossierBrowser({
           className="crt-main-menu__button"
           onClick={onEnterArchive}
         >
-          Enter D.A.R.S.
+          Enter
           <span aria-hidden="true" />
         </button>
       </div>
