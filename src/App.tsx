@@ -229,18 +229,44 @@ type LayoutCssProperties = CSSProperties & {
   '--layout-scale-y'?: number;
 };
 
+/*
+ * Calibrated baseline layout (captured from the in-app layout editor).
+ * Typed as LayoutState so every asset in LAYOUT_ASSETS must have an entry.
+ * A saved layout in localStorage still overrides these per-asset.
+ */
+const DEFAULT_LAYOUT: LayoutState = {
+  crt: { x: 0.384, y: 0.31, scale: 1, width: 1, height: 0.83 },
+  deviceHeader: { x: 0, y: 1.442, scale: 1, width: 1.01, height: 1 },
+  warningBanner: { x: 0.77, y: 4.539, scale: 1, width: 1.1, height: 1 },
+  crtTitleLine: { x: 0, y: -9.042, scale: 1, width: 0.96, height: 1.24 },
+  crtLeftPanel: { x: -3.042, y: 7.157, scale: 1.183, width: 1, height: 1 },
+  crtRightTopPanel: { x: 3.347, y: 9.543, scale: 1.167, width: 1, height: 1.38 },
+  crtRightBottomPanel: { x: 3.345, y: 12.61, scale: 1, width: 1.16, height: 1 },
+  catSpecies: { x: -5.477, y: 8.212, scale: 1.9, width: 1, height: 1.15 },
+  catArtifacts: { x: 4.259, y: 8.623, scale: 1.9, width: 0.99, height: 1.22 },
+  catEvents: { x: -4.869, y: 17.799, scale: 1.95, width: 1.01, height: 1.18 },
+  catAnomalies: { x: 4.562, y: 17.721, scale: 1.9, width: 1.01, height: 1.16 },
+  rearBay: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayCavity: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayRailLeft: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayRailRight: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayShadow: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayFrame: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  shell: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  folder: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  frontBay: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  doorUpper: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  doorLower: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  latch: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  shellOuterMask: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  buttonMenu: { x: -1.923, y: 2.888, scale: 1.44, width: 0.97, height: 1.09 },
+  buttonArchive: { x: 6.537, y: 3.609, scale: 1.732, width: 1.03, height: 1.14 },
+  buttonBack: { x: 8.46, y: 3.3, scale: 1.849, width: 1.02, height: 1 },
+};
+
 function createDefaultLayout(): LayoutState {
   return Object.fromEntries(
-    LAYOUT_ASSETS.map(({ id }) => [
-      id,
-      {
-        x: 0,
-        y: 0,
-        scale: 1,
-        width: 1,
-        height: 1,
-      },
-    ]),
+    LAYOUT_ASSETS.map(({ id }) => [id, { ...DEFAULT_LAYOUT[id] }]),
   ) as LayoutState;
 }
 
