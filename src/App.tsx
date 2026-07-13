@@ -73,7 +73,22 @@ const DOSSIERS: Dossier[] = Array.from({ length: 13 }, (_, index) => {
   };
 });
 
-const SPECIES_OPTIONS = ['Wombats', 'Bullfrogs', 'Bugs', 'People'] as const;
+type CategoryEntry = {
+  id: string;
+  name: string;
+  count: number;
+  locked?: boolean;
+  target?: ScreenId;
+};
+
+const SPECIES_DATABASE: CategoryEntry[] = [
+  { id: '01', name: 'CORVIDS', count: 13 },
+  { id: '02', name: 'BULLFROGS', count: 9 },
+  { id: '03', name: 'WOMBATS', count: 17, target: 'wombats' },
+  { id: '04', name: 'NUTRIAS (GROSS)', count: 8 },
+  { id: '05', name: 'UNKNOWN / REDACTED', count: 0, locked: true },
+];
+
 const OBJECT_OPTIONS = [
   'Toilets',
   'Houses',
@@ -1823,6 +1838,20 @@ function DossierBrowser({
     );
   }
 
+  if (screen === 'species') {
+    return (
+      <CategoryDatabase
+        category="SPECIES"
+        entries={SPECIES_DATABASE}
+        onSelectEntry={(entry) => {
+          if (entry.target === 'wombats') {
+            onOpenWombats();
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="crt-browser">
       <CrtEditableBlock
@@ -1852,21 +1881,6 @@ function DossierBrowser({
         setLayoutNode={setLayoutNode}
         beginMove={beginMove}
       >
-        {screen === 'species' ? (
-          <div className="crt-panel-actions">
-            {SPECIES_OPTIONS.map((species) => (
-              <button
-                key={species}
-                type="button"
-                onClick={species === 'Wombats' ? onOpenWombats : undefined}
-                disabled={species !== 'Wombats'}
-              >
-                {species}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
         {screen === 'objects' ? (
           <div className="crt-panel-list">
             {OBJECT_OPTIONS.map((item) => (
@@ -1913,14 +1927,6 @@ function DossierBrowser({
         beginMove={beginMove}
       >
         <div className="crt-panel-list">
-          {screen === 'species' ? (
-            <>
-              <span>Wombats</span>
-              <span>Bullfrogs</span>
-              <span>Bugs</span>
-              <span>People</span>
-            </>
-          ) : null}
           {screen === 'objects'
             ? OBJECT_OPTIONS.map((item) => <span key={item}>{item}</span>)
             : null}
@@ -2044,6 +2050,98 @@ function CategoryBadge({
       >
         <img src={src} alt="" draggable="false" />
       </button>
+    </div>
+  );
+}
+
+function pad3(value: number): string {
+  return String(value).padStart(3, '0');
+}
+
+function CategoryDatabase({
+  category,
+  entries,
+  onSelectEntry,
+}: {
+  category: string;
+  entries: CategoryEntry[];
+  onSelectEntry: (entry: CategoryEntry) => void;
+}) {
+  const totalRecords = entries.reduce(
+    (sum, entry) => (entry.locked ? sum : sum + entry.count),
+    0,
+  );
+
+  return (
+    <div className="crt-browser crt-database">
+      <div className="crt-db-title">
+        <span
+          className="crt-title-chevrons crt-title-chevrons--left"
+          aria-hidden="true"
+        >
+          <i />
+          <i />
+        </span>
+        <strong>{category} DATABASE</strong>
+        <span
+          className="crt-title-chevrons crt-title-chevrons--right"
+          aria-hidden="true"
+        >
+          <i />
+          <i />
+        </span>
+      </div>
+
+      <div className="crt-db-subtitle">SELECT {category} CATEGORY</div>
+
+      <div className="crt-db-head">
+        <span>ID</span>
+        <span>{category} CATEGORY</span>
+        <span>TOTAL RECORDS: {pad3(totalRecords)}</span>
+      </div>
+
+      <div className="crt-db-list">
+        {entries.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            className={`crt-db-row${entry.locked ? ' crt-db-row--locked' : ''}`}
+            onClick={() => onSelectEntry(entry)}
+            disabled={entry.locked}
+          >
+            <span className="crt-db-row__icon" aria-hidden="true">
+              {entry.locked ? (
+                <svg className="crt-db-lock" viewBox="0 0 24 24">
+                  <rect
+                    x="5"
+                    y="11"
+                    width="14"
+                    height="9"
+                    rx="1.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M8 11 V7.5 a4 4 0 0 1 8 0 V11"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                </svg>
+              ) : null}
+            </span>
+            <span className="crt-db-row__id">{entry.id}</span>
+            <span className="crt-db-row__name">{entry.name}</span>
+            <span className="crt-db-row__count">
+              {entry.locked ? 'REDACTED' : pad3(entry.count)}
+            </span>
+            <span className="crt-db-row__arrow" aria-hidden="true">
+              ›
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

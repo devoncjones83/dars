@@ -1456,6 +1456,157 @@ button {
   transform: none;
 }
 
+/* =========================================================
+   CATEGORY DATABASE  (sub-menu list, e.g. SPECIES DATABASE)
+   ========================================================= */
+
+.crt-database {
+  padding: 6.5% 4% 20%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2.4%;
+
+  letter-spacing: 0.06em;
+}
+
+.crt-db-title {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: 3%;
+
+  font-size: clamp(0.9rem, 2.6vw, 1.45rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.crt-db-subtitle {
+  text-align: center;
+  font-size: clamp(0.5rem, 1.4vw, 0.78rem);
+  letter-spacing: 0.16em;
+}
+
+.crt-db-head {
+  display: grid;
+  grid-template-columns: 4.4em 1fr auto;
+  align-items: end;
+  gap: 0.6em;
+  padding: 0 0.5em 0.35em;
+
+  font-size: clamp(0.42rem, 1.05vw, 0.62rem);
+  letter-spacing: 0.1em;
+  color: rgba(101, 255, 47, 0.62);
+
+  border-bottom: 1px solid rgba(101, 255, 47, 0.26);
+}
+
+.crt-db-head span:last-child {
+  justify-self: end;
+}
+
+.crt-db-list {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  overflow-y: auto;
+  padding-right: 0.4em;
+
+  scrollbar-color: rgba(101, 255, 47, 0.68) rgba(4, 26, 6, 0.24);
+  scrollbar-width: thin;
+}
+
+.crt-db-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.crt-db-list::-webkit-scrollbar-thumb {
+  background: rgba(101, 255, 47, 0.6);
+}
+
+.crt-db-list::-webkit-scrollbar-track {
+  background: rgba(4, 26, 6, 0.24);
+}
+
+.crt-db-row {
+  display: grid;
+  grid-template-columns: 1.9em 2.3em 1fr auto 1em;
+  align-items: center;
+  gap: 0.7em;
+
+  width: 100%;
+  padding: 0.45em 0.7em;
+
+  color: var(--phosphor);
+  font-family: inherit;
+  font-size: clamp(0.5rem, 1.3vw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+
+  border: 1px solid rgba(101, 255, 47, 0.58);
+  border-radius: 7px;
+  background: rgba(101, 255, 47, 0.045);
+  cursor: pointer;
+  text-shadow: inherit;
+}
+
+.crt-db-row:hover:not(:disabled) {
+  background: rgba(101, 255, 47, 0.13);
+}
+
+.crt-db-row:disabled,
+.crt-db-row--locked {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.crt-db-row__icon {
+  width: 1.8em;
+  height: 1.8em;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(101, 255, 47, 0.5);
+  border-radius: 5px;
+}
+
+.crt-db-lock {
+  width: 1.05em;
+  height: 1.05em;
+  color: var(--phosphor);
+}
+
+.crt-db-row__id {
+  color: rgba(101, 255, 47, 0.82);
+}
+
+.crt-db-row__name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.crt-db-row__count {
+  justify-self: end;
+  letter-spacing: 0.1em;
+}
+
+.crt-db-row__arrow {
+  justify-self: end;
+  font-size: 1.25em;
+  line-height: 1;
+}
+
 .crt-layout-offset {
   position: absolute;
   inset: 0;
