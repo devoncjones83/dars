@@ -1407,10 +1407,19 @@ button {
 }
 
 .crt-category-tile img {
+  /*
+   * Source badges read yellow-green; nudge their hue toward the CRT
+   * phosphor (~+22deg). Raise the angle for greener, set to none for the
+   * original lime.
+   */
+  --badge-tint: hue-rotate(22deg) saturate(1.05);
+
   max-width: 100%;
   max-height: 100%;
 
   object-fit: contain;
+
+  filter: var(--badge-tint);
 
   pointer-events: none;
   user-select: none;
@@ -1422,7 +1431,10 @@ button {
 
 .crt-category-tile:hover img {
   transform: scale(1.03);
-  filter: brightness(1.12) drop-shadow(0 0 7px rgba(101, 255, 47, 0.55));
+  filter:
+    var(--badge-tint)
+    brightness(1.12)
+    drop-shadow(0 0 7px rgba(101, 255, 47, 0.55));
 }
 
 .crt-category-tile:active img {
