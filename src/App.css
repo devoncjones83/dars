@@ -1048,7 +1048,8 @@ button {
   justify-content: space-between;
   gap: 3%;
 
-  padding: 1% 0;
+  /* Top pad drops "INITIALIZING D.A.R.S." clear of the status strip. */
+  padding: 8% 0 2%;
 
   font-size: clamp(6px, 1.4vw, 11px);
   letter-spacing: 0.12em;
@@ -1513,6 +1514,10 @@ button {
   min-width: 0;
   padding: 0.36rem 0.45rem;
 
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+
   color: var(--phosphor);
   font-family: inherit;
   font-size: clamp(0.62rem, 1.55vw, 0.96rem);
@@ -1525,6 +1530,19 @@ button {
   background: rgba(101, 255, 47, 0.035);
   cursor: pointer;
   text-shadow: inherit;
+}
+
+.crt-btn-icon {
+  flex: 0 0 auto;
+  width: 1.6em;
+  height: 1.6em;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 0 3px rgba(101, 255, 47, 0.5));
+
+  pointer-events: none;
+  user-select: none;
 }
 
 .crt-panel-actions button:hover,

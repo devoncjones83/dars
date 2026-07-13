@@ -116,6 +116,11 @@ const ASSETS = {
   buttonArchive: `${ASSET_ROOT}/button_archive.png`,
   buttonBack: `${ASSET_ROOT}/button_back.png`,
   containmentFolder: `${ASSET_ROOT}/containment_record_folder.png`,
+
+  recordIcon: `${ASSET_ROOT}/record_icon.png`,
+  speciesIcon: `${ASSET_ROOT}/species_icon.png`,
+  objectIcon: `${ASSET_ROOT}/object_icon.png`,
+  eventIcon: `${ASSET_ROOT}/event_icon.png`,
 } as const;
 
 const STATUS_LABELS: Record<BayState, string> = {
@@ -1730,12 +1735,33 @@ function DossierBrowser({
         {screen === 'menu' ? (
           <div className="crt-panel-actions">
             <button type="button" onClick={onSelectSpecies}>
+              <img
+                className="crt-btn-icon"
+                src={ASSETS.speciesIcon}
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
               Species
             </button>
             <button type="button" onClick={onSelectObjects}>
+              <img
+                className="crt-btn-icon"
+                src={ASSETS.objectIcon}
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
               Objects
             </button>
             <button type="button" onClick={onSelectEvents}>
+              <img
+                className="crt-btn-icon"
+                src={ASSETS.eventIcon}
+                alt=""
+                aria-hidden="true"
+                draggable="false"
+              />
               Events
             </button>
           </div>
@@ -1779,6 +1805,13 @@ function DossierBrowser({
                 }
                 onClick={() => onOpenDossier(dossier.id)}
               >
+                <img
+                  className="crt-btn-icon"
+                  src={ASSETS.recordIcon}
+                  alt=""
+                  aria-hidden="true"
+                  draggable="false"
+                />
                 {dossier.id}
               </button>
             ))}
