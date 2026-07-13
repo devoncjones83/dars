@@ -1379,6 +1379,56 @@ button {
   right: 13%;
 }
 
+/* =========================================================
+   CATEGORY SELECT  (menu screen 2x2 badge grid)
+   ========================================================= */
+
+.crt-category-grid {
+  position: absolute;
+  inset: 6% 1% 22% 1%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3%;
+}
+
+.crt-category-tile {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.crt-category-tile img {
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
+}
+
+.crt-category-tile:hover img {
+  transform: scale(1.03);
+  filter: brightness(1.12) drop-shadow(0 0 7px rgba(101, 255, 47, 0.55));
+}
+
+.crt-category-tile:active img {
+  transform: scale(0.98);
+}
+
 .crt-layout-offset {
   position: absolute;
   inset: 0;

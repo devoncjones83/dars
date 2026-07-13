@@ -23,6 +23,7 @@ type ScreenId =
   | 'species'
   | 'objects'
   | 'events'
+  | 'anomalies'
   | 'wombats'
   | 'dossier';
 
@@ -121,6 +122,11 @@ const ASSETS = {
   speciesIcon: `${ASSET_ROOT}/species_icon.png`,
   objectIcon: `${ASSET_ROOT}/object_icon.png`,
   eventIcon: `${ASSET_ROOT}/event_icon.png`,
+
+  speciesBadge: `${ASSET_ROOT}/species_badge.png`,
+  artifactBadge: `${ASSET_ROOT}/artifact_badge.png`,
+  eventBadge: `${ASSET_ROOT}/event_badge.png`,
+  anomalyBadge: `${ASSET_ROOT}/anomaly_badge.png`,
 } as const;
 
 const STATUS_LABELS: Record<BayState, string> = {
@@ -482,7 +488,8 @@ function App() {
     if (
       currentScreen === 'species' ||
       currentScreen === 'objects' ||
-      currentScreen === 'events'
+      currentScreen === 'events' ||
+      currentScreen === 'anomalies'
     ) {
       return 'menu';
     }
@@ -1144,6 +1151,7 @@ function App() {
                     onSelectSpecies={() => navigateToScreen('species')}
                     onSelectObjects={() => navigateToScreen('objects')}
                     onSelectEvents={() => navigateToScreen('events')}
+                    onSelectAnomalies={() => navigateToScreen('anomalies')}
                     onOpenWombats={() => navigateToScreen('wombats')}
                     onOpenDossier={openDossier}
                   />
@@ -1628,11 +1636,15 @@ function getCrtTitle(screen: ScreenId): string {
   }
 
   if (screen === 'objects') {
-    return 'Select Objects Type';
+    return 'Select Artifacts Type';
   }
 
   if (screen === 'events') {
     return 'Select Events Type';
+  }
+
+  if (screen === 'anomalies') {
+    return 'Select Anomalies Type';
   }
 
   if (screen === 'wombats' || screen === 'dossier') {
@@ -1655,6 +1667,7 @@ function DossierBrowser({
   onSelectSpecies,
   onSelectObjects,
   onSelectEvents,
+  onSelectAnomalies,
   onOpenWombats,
   onOpenDossier,
 }: {
@@ -1673,6 +1686,7 @@ function DossierBrowser({
   onSelectSpecies: () => void;
   onSelectObjects: () => void;
   onSelectEvents: () => void;
+  onSelectAnomalies: () => void;
   onOpenWombats: () => void;
   onOpenDossier: (id: string) => void;
 }) {
@@ -1699,6 +1713,43 @@ function DossierBrowser({
           Enter
           <span aria-hidden="true" />
         </button>
+      </div>
+    );
+  }
+
+  if (screen === 'menu') {
+    return (
+      <div className="crt-browser crt-category">
+        <div className="crt-category-grid">
+          <button
+            type="button"
+            className="crt-category-tile"
+            onClick={onSelectSpecies}
+          >
+            <img src={ASSETS.speciesBadge} alt="Species" draggable="false" />
+          </button>
+          <button
+            type="button"
+            className="crt-category-tile"
+            onClick={onSelectObjects}
+          >
+            <img src={ASSETS.artifactBadge} alt="Artifacts" draggable="false" />
+          </button>
+          <button
+            type="button"
+            className="crt-category-tile"
+            onClick={onSelectEvents}
+          >
+            <img src={ASSETS.eventBadge} alt="Events" draggable="false" />
+          </button>
+          <button
+            type="button"
+            className="crt-category-tile"
+            onClick={onSelectAnomalies}
+          >
+            <img src={ASSETS.anomalyBadge} alt="Anomalies" draggable="false" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -1732,41 +1783,6 @@ function DossierBrowser({
         setLayoutNode={setLayoutNode}
         beginMove={beginMove}
       >
-        {screen === 'menu' ? (
-          <div className="crt-panel-actions">
-            <button type="button" onClick={onSelectSpecies}>
-              <img
-                className="crt-btn-icon"
-                src={ASSETS.speciesIcon}
-                alt=""
-                aria-hidden="true"
-                draggable="false"
-              />
-              Species
-            </button>
-            <button type="button" onClick={onSelectObjects}>
-              <img
-                className="crt-btn-icon"
-                src={ASSETS.objectIcon}
-                alt=""
-                aria-hidden="true"
-                draggable="false"
-              />
-              Objects
-            </button>
-            <button type="button" onClick={onSelectEvents}>
-              <img
-                className="crt-btn-icon"
-                src={ASSETS.eventIcon}
-                alt=""
-                aria-hidden="true"
-                draggable="false"
-              />
-              Events
-            </button>
-          </div>
-        ) : null}
-
         {screen === 'species' ? (
           <div className="crt-panel-actions">
             {SPECIES_OPTIONS.map((species) => (
@@ -1790,7 +1806,7 @@ function DossierBrowser({
           </div>
         ) : null}
 
-        {screen === 'events' ? (
+        {screen === 'events' || screen === 'anomalies' ? (
           <div className="crt-panel-message">RESTRICTED</div>
         ) : null}
 
@@ -1828,13 +1844,6 @@ function DossierBrowser({
         beginMove={beginMove}
       >
         <div className="crt-panel-list">
-          {screen === 'menu' ? (
-            <>
-              <span>Species</span>
-              <span>Objects</span>
-              <span>Events</span>
-            </>
-          ) : null}
           {screen === 'species' ? (
             <>
               <span>Wombats</span>
@@ -1851,7 +1860,9 @@ function DossierBrowser({
                 <span key={dossier.id}>{dossier.id}</span>
               ))
             : null}
-          {screen === 'events' ? <span>RESTRICTED</span> : null}
+          {screen === 'events' || screen === 'anomalies' ? (
+            <span>RESTRICTED</span>
+          ) : null}
         </div>
       </CrtEditableBlock>
 
