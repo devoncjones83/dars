@@ -1256,7 +1256,7 @@ button {
   grid-template-rows: auto auto auto auto auto;
   align-content: center;
   justify-items: center;
-  gap: 4.5%;
+  gap: 3.2%;
 
   /*
    * The home menu fills the whole CRT (crt-browser inset: 0). Header bar
@@ -1264,16 +1264,16 @@ button {
    * clear it, and keep a large bottom pad so the ENTER button + copy ride
    * above the warning footer. Tune these two values to taste.
    */
-  padding: 12% 6% 26%;
+  padding: 15% 8% 22%;
 
   text-align: center;
 }
 
 .crt-main-menu__title {
-  font-size: clamp(1.02rem, 3.2vw, 1.85rem);
+  font-size: clamp(0.72rem, 2.3vw, 1.28rem);
   font-weight: 900;
-  letter-spacing: 0.16em;
-  line-height: 1;
+  letter-spacing: 0.14em;
+  line-height: 1.08;
 }
 
 .crt-main-menu__subtitle,
@@ -1322,16 +1322,16 @@ button {
 
 .crt-main-menu__button {
   position: relative;
-  width: min(78%, 340px);
-  min-height: 70px;
-  padding: 0.8rem 1rem 1rem;
+  width: min(64%, 240px);
+  min-height: 42px;
+  padding: 0.5rem 0.9rem 0.55rem;
 
   display: grid;
   place-items: center;
 
   color: var(--phosphor);
   font-family: inherit;
-  font-size: clamp(1rem, 3vw, 1.75rem);
+  font-size: clamp(0.78rem, 2vw, 1.15rem);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1361,9 +1361,9 @@ button {
 .crt-main-menu__button::after {
   content: "";
   position: absolute;
-  bottom: 18px;
+  bottom: 9px;
 
-  width: 26%;
+  width: 24%;
   height: 1px;
 
   background: rgba(101, 255, 47, 0.62);
