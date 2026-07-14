@@ -77,25 +77,11 @@ type CategoryEntry = {
   id: string;
   name: string;
   count: number;
+  icon?: string;
+  dossierId?: string;
   locked?: boolean;
   target?: ScreenId;
 };
-
-const SPECIES_DATABASE: CategoryEntry[] = [
-  { id: '01', name: 'CORVIDS', count: 13 },
-  { id: '02', name: 'BULLFROGS', count: 9 },
-  { id: '03', name: 'WOMBATS', count: 17, target: 'wombats' },
-  { id: '04', name: 'NUTRIAS (GROSS)', count: 8 },
-  { id: '05', name: 'UNKNOWN / REDACTED', count: 0, locked: true },
-];
-
-const OBJECT_OPTIONS = [
-  'Toilets',
-  'Houses',
-  'Wigs',
-  'Earwigs',
-  'Leggings',
-] as const;
 
 type BootTask = {
   label: string;
@@ -135,14 +121,170 @@ const ASSETS = {
 
   recordIcon: `${ASSET_ROOT}/record_icon.png`,
   speciesIcon: `${ASSET_ROOT}/species_icon.png`,
+  speciesWombatIcon: `${ASSET_ROOT}/species_wombat_icon.png`,
+  speciesCorvidIcon: `${ASSET_ROOT}/species_corvid_icon.png`,
+  speciesBullfrogIcon: `${ASSET_ROOT}/species_bullfrog_icon.png`,
+  speciesNutriaIcon: `${ASSET_ROOT}/species_nutria_icon.png`,
+  speciesPlatypusIcon: `${ASSET_ROOT}/species_platypus_icon.png`,
   objectIcon: `${ASSET_ROOT}/object_icon.png`,
   eventIcon: `${ASSET_ROOT}/event_icon.png`,
+  artifactVhsTape: `${ASSET_ROOT}/artifact_vhs_tape.png`,
+  artifactImpossibleKey: `${ASSET_ROOT}/artifact_impossible_key.png`,
+  artifactHatSuperiority: `${ASSET_ROOT}/artifact_hat_superiority.png`,
+  artifactDairyAnomaly: `${ASSET_ROOT}/artifact_dairy_anomaly.png`,
+  artifactBucketThatKnows: `${ASSET_ROOT}/artifact_bucket_that_knows.png`,
+  artifactUnflushableBowl: `${ASSET_ROOT}/artifact_unflushable_bowl.png`,
 
-  speciesBadge: `${ASSET_ROOT}/species_badge.png`,
-  artifactBadge: `${ASSET_ROOT}/artifact_badge.png`,
-  eventBadge: `${ASSET_ROOT}/event_badge.png`,
-  anomalyBadge: `${ASSET_ROOT}/anomaly_badge.png`,
+  categoryHexFrame: `${ASSET_ROOT}/category_hex_frame.png`,
+  speciesBadge: `${ASSET_ROOT}/category_species_icon.png`,
+  artifactBadge: `${ASSET_ROOT}/category_artifact_icon.png`,
+  eventBadge: `${ASSET_ROOT}/category_event_icon.png`,
+  anomalyBadge: `${ASSET_ROOT}/category_anomalies_icon.png`,
 } as const;
+
+const SPECIES_DATABASE: CategoryEntry[] = [
+  { id: '01', name: 'CORVIDS', count: 13, icon: ASSETS.speciesCorvidIcon },
+  { id: '02', name: 'BULLFROGS', count: 9, icon: ASSETS.speciesBullfrogIcon },
+  {
+    id: '03',
+    name: 'WOMBATS',
+    count: 17,
+    icon: ASSETS.speciesWombatIcon,
+    target: 'wombats',
+  },
+  {
+    id: '04',
+    name: 'NUTRIAS (GROSS)',
+    count: 8,
+    icon: ASSETS.speciesNutriaIcon,
+  },
+  {
+    id: '05',
+    name: 'PLATYPUS',
+    count: 1,
+    icon: ASSETS.speciesPlatypusIcon,
+    dossierId: 'PLTY-001',
+  },
+  { id: '06', name: 'UNKNOWN / REDACTED', count: 0, locked: true },
+];
+
+const ARTIFACT_DOSSIERS: Dossier[] = [
+  {
+    id: 'ARTF-001',
+    name: 'THE VHS TAPE OF REGRET',
+    status: 'INDEXED',
+    classification: 'OBJECT / MEMETIC',
+    date: '1994-11-03',
+    summary:
+      'Playback causes viewers to remember every social mistake they have ever made in broadcast order. Rewinding is prohibited.',
+  },
+  {
+    id: 'ARTF-002',
+    name: 'THE IMPOSSIBLE KEY',
+    status: 'CONTAINED',
+    classification: 'OBJECT / SPATIAL',
+    date: '1979-06-21',
+    summary:
+      'Key fits locks that do not exist yet. Any opened door must be reported before personnel ask where it came from.',
+  },
+  {
+    id: 'ARTF-003',
+    name: 'THE HAT OF SUPERIORITY',
+    status: 'MONITORED',
+    classification: 'OBJECT / COGNITIVE',
+    date: '1983-02-14',
+    summary:
+      'Wearer becomes certain they are the ranking authority in any room. Effect ends when hat is complimented sincerely.',
+  },
+  {
+    id: 'ARTF-004',
+    name: 'THE DAIRY ANOMALY',
+    status: 'QUARANTINED',
+    classification: 'OBJECT / BIOACTIVE',
+    date: '2001-09-09',
+    summary:
+      'Carton remains full regardless of volume poured. Contents are nutritionally normal and emotionally judgmental.',
+  },
+  {
+    id: 'ARTF-005',
+    name: 'THE BUCKET THAT KNOWS',
+    status: 'INDEXED',
+    classification: 'OBJECT / ORACLE',
+    date: '1998-05-27',
+    summary:
+      'Bucket answers yes-or-no questions through condensation patterns. It refuses to discuss mops.',
+  },
+  {
+    id: 'ARTF-006',
+    name: 'THE UNFLUSHABLE BOWL',
+    status: 'RESTRICTED',
+    classification: 'OBJECT / HYDRAULIC',
+    date: '1966-01-19',
+    summary:
+      'Fixture resists all disposal attempts. Archive recommends acknowledging its victory before engaging secondary containment.',
+  },
+];
+
+const PLATYPUS_DOSSIER: Dossier = {
+  id: 'PLTY-001',
+  name: 'PLATYPUS SPECIMEN 001',
+  status: 'INDEXED',
+  classification: 'TIER I',
+  date: '1992-07-18',
+  summary:
+    'Single-entry species record. Subject displays improbable composure and refuses all conventional taxonomy jokes.',
+};
+
+const ALL_DOSSIERS: Dossier[] = [
+  ...DOSSIERS,
+  PLATYPUS_DOSSIER,
+  ...ARTIFACT_DOSSIERS,
+];
+
+const ARTIFACTS_DATABASE: CategoryEntry[] = [
+  {
+    id: '01',
+    name: 'THE VHS TAPE OF REGRET',
+    count: 1,
+    icon: ASSETS.artifactVhsTape,
+    dossierId: 'ARTF-001',
+  },
+  {
+    id: '02',
+    name: 'THE IMPOSSIBLE KEY',
+    count: 1,
+    icon: ASSETS.artifactImpossibleKey,
+    dossierId: 'ARTF-002',
+  },
+  {
+    id: '03',
+    name: 'THE HAT OF SUPERIORITY',
+    count: 1,
+    icon: ASSETS.artifactHatSuperiority,
+    dossierId: 'ARTF-003',
+  },
+  {
+    id: '04',
+    name: 'THE DAIRY ANOMALY',
+    count: 1,
+    icon: ASSETS.artifactDairyAnomaly,
+    dossierId: 'ARTF-004',
+  },
+  {
+    id: '05',
+    name: 'THE BUCKET THAT KNOWS',
+    count: 1,
+    icon: ASSETS.artifactBucketThatKnows,
+    dossierId: 'ARTF-005',
+  },
+  {
+    id: '06',
+    name: 'THE UNFLUSHABLE BOWL',
+    count: 1,
+    icon: ASSETS.artifactUnflushableBowl,
+    dossierId: 'ARTF-006',
+  },
+];
 
 const STATUS_LABELS: Record<BayState, string> = {
   closed: 'CLOSED',
@@ -176,9 +318,13 @@ const LAYOUT_ASSETS = [
   { id: 'crtRightTopPanel', label: 'CRT Right Top Panel' },
   { id: 'crtRightBottomPanel', label: 'CRT Right Bottom Panel' },
   { id: 'catSpecies', label: 'Category: Species' },
+  { id: 'catSpeciesFrame', label: 'Category Hex: Species' },
   { id: 'catArtifacts', label: 'Category: Artifacts' },
+  { id: 'catArtifactsFrame', label: 'Category Hex: Artifacts' },
   { id: 'catEvents', label: 'Category: Events' },
+  { id: 'catEventsFrame', label: 'Category Hex: Events' },
   { id: 'catAnomalies', label: 'Category: Anomalies' },
+  { id: 'catAnomaliesFrame', label: 'Category Hex: Anomalies' },
   { id: 'rearBay', label: 'Rear Bay Group' },
   { id: 'bayCavity', label: 'Bay Cavity' },
   { id: 'bayRailLeft', label: 'Left Bay Rail' },
@@ -258,9 +404,13 @@ const DEFAULT_LAYOUT: LayoutState = {
   crtRightTopPanel: { x: 3.347, y: 9.543, scale: 1.167, width: 1, height: 1.38 },
   crtRightBottomPanel: { x: 3.345, y: 12.61, scale: 1, width: 1.16, height: 1 },
   catSpecies: { x: -5.234, y: 8.212, scale: 1.21, width: 1, height: 1.15 },
+  catSpeciesFrame: { x: -5.234, y: 8.212, scale: 1.21, width: 1.02, height: 1.16 },
   catArtifacts: { x: 3.651, y: 8.623, scale: 1.19, width: 0.99, height: 1.22 },
+  catArtifactsFrame: { x: 3.651, y: 8.623, scale: 1.19, width: 1.01, height: 1.2 },
   catEvents: { x: -4.869, y: 17.799, scale: 1.15, width: 1.01, height: 1.18 },
+  catEventsFrame: { x: -4.869, y: 17.799, scale: 1.15, width: 1.02, height: 1.17 },
   catAnomalies: { x: 3.954, y: 17.31, scale: 1.15, width: 1.01, height: 1.16 },
+  catAnomaliesFrame: { x: 3.954, y: 17.31, scale: 1.15, width: 1.02, height: 1.16 },
   rearBay: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   bayCavity: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   bayRailLeft: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
@@ -343,6 +493,8 @@ function App() {
   const [selectedDossierId, setSelectedDossierId] = useState<string | null>(
     null,
   );
+  const [dossierReturnScreen, setDossierReturnScreen] =
+    useState<ScreenId>('wombats');
   const [operatorMessage, setOperatorMessage] = useState<string | null>(null);
   const [pendingNavigation, setPendingNavigation] = useState<ScreenId | null>(
     null,
@@ -361,7 +513,7 @@ function App() {
 
   const selectedAdjustment = layout[selectedAssetId];
   const selectedDossier =
-    DOSSIERS.find((dossier) => dossier.id === selectedDossierId) ?? null;
+    ALL_DOSSIERS.find((dossier) => dossier.id === selectedDossierId) ?? null;
   const isProtectedLayoutAsset = PROTECTED_LAYOUT_ASSET_IDS.includes(
     selectedAssetId as (typeof PROTECTED_LAYOUT_ASSET_IDS)[number],
   );
@@ -505,9 +657,33 @@ function App() {
     }
 
     setOperatorMessage(null);
+    setDossierReturnScreen('wombats');
     setSelectedDossierId(id);
     setScreen('dossier');
   }, [isBusy]);
+
+  const deliverDossier = useCallback(
+    (id: string, returnScreen: ScreenId) => {
+      if (editMode || isBusy || pendingNavigation) {
+        return;
+      }
+
+      if (!ALL_DOSSIERS.some((dossier) => dossier.id === id)) {
+        setOperatorMessage('DOSSIER NOT FOUND');
+        return;
+      }
+
+      setOperatorMessage(null);
+      setDossierReturnScreen(returnScreen);
+      setSelectedDossierId(id);
+      setScreen('dossier');
+
+      if (bayState === 'closed') {
+        openBay();
+      }
+    },
+    [bayState, editMode, isBusy, openBay, pendingNavigation],
+  );
 
   const navigateToScreen = useCallback(
     (nextScreen: ScreenId) => {
@@ -523,7 +699,7 @@ function App() {
 
   const getBackDestination = useCallback((currentScreen: ScreenId): ScreenId => {
     if (currentScreen === 'dossier') {
-      return 'wombats';
+      return dossierReturnScreen;
     }
 
     if (currentScreen === 'wombats') {
@@ -540,7 +716,7 @@ function App() {
     }
 
     return 'home';
-  }, []);
+  }, [dossierReturnScreen]);
 
   const handleBack = useCallback(() => {
     if (editMode || isBusy || pendingNavigation) {
@@ -1187,6 +1363,7 @@ function App() {
                     screen={screen}
                     dossiers={DOSSIERS}
                     selectedDossierId={selectedDossierId}
+                    selectedDossier={selectedDossier}
                     operatorMessage={operatorMessage}
                     getOffsetStyle={getOffsetStyle}
                     getScaleStyle={getScaleStyle}
@@ -1199,6 +1376,7 @@ function App() {
                     onSelectAnomalies={() => navigateToScreen('anomalies')}
                     onOpenWombats={() => navigateToScreen('wombats')}
                     onOpenDossier={openDossier}
+                    onDeliverDossier={deliverDossier}
                   />
                 ) : (
                   <BootScreen phase={bootPhase} progress={bootProgress} />
@@ -1681,7 +1859,7 @@ function getCrtTitle(screen: ScreenId): string {
   }
 
   if (screen === 'objects') {
-    return 'Select Artifacts Type';
+    return 'Artifacts Database';
   }
 
   if (screen === 'events') {
@@ -1703,6 +1881,7 @@ function DossierBrowser({
   screen,
   dossiers,
   selectedDossierId,
+  selectedDossier,
   operatorMessage,
   getOffsetStyle,
   getScaleStyle,
@@ -1715,10 +1894,12 @@ function DossierBrowser({
   onSelectAnomalies,
   onOpenWombats,
   onOpenDossier,
+  onDeliverDossier,
 }: {
   screen: ScreenId;
   dossiers: Dossier[];
   selectedDossierId: string | null;
+  selectedDossier: Dossier | null;
   operatorMessage: string | null;
   getOffsetStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
   getScaleStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
@@ -1734,10 +1915,8 @@ function DossierBrowser({
   onSelectAnomalies: () => void;
   onOpenWombats: () => void;
   onOpenDossier: (id: string) => void;
+  onDeliverDossier: (id: string, returnScreen: ScreenId) => void;
 }) {
-  const selectedDossier =
-    dossiers.find((dossier) => dossier.id === selectedDossierId) ?? null;
-
   if (screen === 'home') {
     return (
       <div className="crt-browser crt-main-menu">
@@ -1792,6 +1971,7 @@ function DossierBrowser({
 
         <CategoryBadge
           assetId="catSpecies"
+          frameAssetId="catSpeciesFrame"
           className="cat-badge cat-badge--species"
           src={ASSETS.speciesBadge}
           label="Species"
@@ -1803,6 +1983,7 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catArtifacts"
+          frameAssetId="catArtifactsFrame"
           className="cat-badge cat-badge--artifacts"
           src={ASSETS.artifactBadge}
           label="Artifacts"
@@ -1814,6 +1995,7 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catEvents"
+          frameAssetId="catEventsFrame"
           className="cat-badge cat-badge--events"
           src={ASSETS.eventBadge}
           label="Events"
@@ -1825,6 +2007,7 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catAnomalies"
+          frameAssetId="catAnomaliesFrame"
           className="cat-badge cat-badge--anomalies"
           src={ASSETS.anomalyBadge}
           label="Anomalies"
@@ -1846,10 +2029,33 @@ function DossierBrowser({
         onSelectEntry={(entry) => {
           if (entry.target === 'wombats') {
             onOpenWombats();
+            return;
+          }
+
+          if (entry.dossierId) {
+            onDeliverDossier(entry.dossierId, 'species');
           }
         }}
       />
     );
+  }
+
+  if (screen === 'objects') {
+    return (
+      <CategoryDatabase
+        category="ARTIFACT"
+        entries={ARTIFACTS_DATABASE}
+        onSelectEntry={(entry) => {
+          if (entry.dossierId) {
+            onDeliverDossier(entry.dossierId, 'objects');
+          }
+        }}
+      />
+    );
+  }
+
+  if (screen === 'events' || screen === 'anomalies') {
+    return <RestrictedScreen />;
   }
 
   return (
@@ -1881,18 +2087,6 @@ function DossierBrowser({
         setLayoutNode={setLayoutNode}
         beginMove={beginMove}
       >
-        {screen === 'objects' ? (
-          <div className="crt-panel-list">
-            {OBJECT_OPTIONS.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-        ) : null}
-
-        {screen === 'events' || screen === 'anomalies' ? (
-          <div className="crt-panel-message">RESTRICTED</div>
-        ) : null}
-
         {(screen === 'wombats' || screen === 'dossier') ? (
           <div className="crt-panel-actions crt-panel-actions--records">
             {dossiers.map((dossier) => (
@@ -1927,17 +2121,11 @@ function DossierBrowser({
         beginMove={beginMove}
       >
         <div className="crt-panel-list">
-          {screen === 'objects'
-            ? OBJECT_OPTIONS.map((item) => <span key={item}>{item}</span>)
-            : null}
           {screen === 'wombats' || screen === 'dossier'
             ? dossiers.slice(0, 6).map((dossier) => (
                 <span key={dossier.id}>{dossier.id}</span>
               ))
             : null}
-          {screen === 'events' || screen === 'anomalies' ? (
-            <span>RESTRICTED</span>
-          ) : null}
         </div>
       </CrtEditableBlock>
 
@@ -1961,6 +2149,14 @@ function DossierBrowser({
           </div>
         )}
       </CrtEditableBlock>
+    </div>
+  );
+}
+
+function RestrictedScreen() {
+  return (
+    <div className="crt-browser crt-restricted-screen">
+      <div className="crt-restricted-message">RESTRICTED</div>
     </div>
   );
 }
@@ -2008,6 +2204,7 @@ function CrtEditableBlock({
 
 function CategoryBadge({
   assetId,
+  frameAssetId,
   className,
   src,
   label,
@@ -2020,6 +2217,13 @@ function CategoryBadge({
   assetId: Extract<
     LayoutAssetId,
     'catSpecies' | 'catArtifacts' | 'catEvents' | 'catAnomalies'
+  >;
+  frameAssetId: Extract<
+    LayoutAssetId,
+    | 'catSpeciesFrame'
+    | 'catArtifactsFrame'
+    | 'catEventsFrame'
+    | 'catAnomaliesFrame'
   >;
   className: string;
   src: string;
@@ -2034,23 +2238,40 @@ function CategoryBadge({
   ) => void;
 }) {
   return (
-    <div
-      className={`crt-layout-offset crt-layout-offset--${assetId}`}
-      style={getOffsetStyle(assetId)}
-    >
-      <button
-        ref={(node) => setLayoutNode(assetId, node)}
-        className={`${className} layout-editable`}
-        style={getScaleStyle(assetId)}
-        data-layout-id={assetId}
-        type="button"
-        onClick={onClick}
-        onPointerDown={(event) => beginMove(event, assetId)}
-        aria-label={label}
+    <>
+      <div
+        className={`crt-layout-offset crt-layout-offset--${frameAssetId}`}
+        style={getOffsetStyle(frameAssetId)}
       >
-        <img src={src} alt="" draggable="false" />
-      </button>
-    </div>
+        <div
+          ref={(node) => setLayoutNode(frameAssetId, node)}
+          className={`${className} cat-badge-frame layout-editable`}
+          style={getScaleStyle(frameAssetId)}
+          data-layout-id={frameAssetId}
+          onPointerDown={(event) => beginMove(event, frameAssetId)}
+          aria-hidden="true"
+        >
+          <img src={ASSETS.categoryHexFrame} alt="" draggable="false" />
+        </div>
+      </div>
+      <div
+        className={`crt-layout-offset crt-layout-offset--${assetId}`}
+        style={getOffsetStyle(assetId)}
+      >
+        <button
+          ref={(node) => setLayoutNode(assetId, node)}
+          className={`${className} layout-editable`}
+          style={getScaleStyle(assetId)}
+          data-layout-id={assetId}
+          type="button"
+          onClick={onClick}
+          onPointerDown={(event) => beginMove(event, assetId)}
+          aria-label={label}
+        >
+          <img src={src} alt="" draggable="false" />
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -2092,8 +2313,6 @@ function CategoryDatabase({
         </span>
       </div>
 
-      <div className="crt-db-subtitle">SELECT {category} CATEGORY</div>
-
       <div className="crt-db-head">
         <span>ID</span>
         <span>{category} CATEGORY</span>
@@ -2129,6 +2348,13 @@ function CategoryDatabase({
                     strokeWidth="2"
                   />
                 </svg>
+              ) : entry.icon ? (
+                <img
+                  className="crt-db-row__species-icon"
+                  src={entry.icon}
+                  alt=""
+                  draggable="false"
+                />
               ) : null}
             </span>
             <span className="crt-db-row__id">{entry.id}</span>
