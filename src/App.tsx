@@ -318,13 +318,9 @@ const LAYOUT_ASSETS = [
   { id: 'crtRightTopPanel', label: 'CRT Right Top Panel' },
   { id: 'crtRightBottomPanel', label: 'CRT Right Bottom Panel' },
   { id: 'catSpecies', label: 'Category: Species' },
-  { id: 'catSpeciesFrame', label: 'Category Hex: Species' },
   { id: 'catArtifacts', label: 'Category: Artifacts' },
-  { id: 'catArtifactsFrame', label: 'Category Hex: Artifacts' },
   { id: 'catEvents', label: 'Category: Events' },
-  { id: 'catEventsFrame', label: 'Category Hex: Events' },
   { id: 'catAnomalies', label: 'Category: Anomalies' },
-  { id: 'catAnomaliesFrame', label: 'Category Hex: Anomalies' },
   { id: 'rearBay', label: 'Rear Bay Group' },
   { id: 'bayCavity', label: 'Bay Cavity' },
   { id: 'bayRailLeft', label: 'Left Bay Rail' },
@@ -404,13 +400,9 @@ const DEFAULT_LAYOUT: LayoutState = {
   crtRightTopPanel: { x: 3.347, y: 9.543, scale: 1.167, width: 1, height: 1.38 },
   crtRightBottomPanel: { x: 3.345, y: 12.61, scale: 1, width: 1.16, height: 1 },
   catSpecies: { x: -5.234, y: 8.212, scale: 1.21, width: 1, height: 1.15 },
-  catSpeciesFrame: { x: -5.234, y: 8.212, scale: 1.21, width: 1.02, height: 1.16 },
   catArtifacts: { x: 3.651, y: 8.623, scale: 1.19, width: 0.99, height: 1.22 },
-  catArtifactsFrame: { x: 3.651, y: 8.623, scale: 1.19, width: 1.01, height: 1.2 },
   catEvents: { x: -4.869, y: 17.799, scale: 1.15, width: 1.01, height: 1.18 },
-  catEventsFrame: { x: -4.869, y: 17.799, scale: 1.15, width: 1.02, height: 1.17 },
   catAnomalies: { x: 3.954, y: 17.31, scale: 1.15, width: 1.01, height: 1.16 },
-  catAnomaliesFrame: { x: 3.954, y: 17.31, scale: 1.15, width: 1.02, height: 1.16 },
   rearBay: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   bayCavity: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   bayRailLeft: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
@@ -1971,7 +1963,6 @@ function DossierBrowser({
 
         <CategoryBadge
           assetId="catSpecies"
-          frameAssetId="catSpeciesFrame"
           className="cat-badge cat-badge--species"
           src={ASSETS.speciesBadge}
           label="Species"
@@ -1983,7 +1974,6 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catArtifacts"
-          frameAssetId="catArtifactsFrame"
           className="cat-badge cat-badge--artifacts"
           src={ASSETS.artifactBadge}
           label="Artifacts"
@@ -1995,7 +1985,6 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catEvents"
-          frameAssetId="catEventsFrame"
           className="cat-badge cat-badge--events"
           src={ASSETS.eventBadge}
           label="Events"
@@ -2007,7 +1996,6 @@ function DossierBrowser({
         />
         <CategoryBadge
           assetId="catAnomalies"
-          frameAssetId="catAnomaliesFrame"
           className="cat-badge cat-badge--anomalies"
           src={ASSETS.anomalyBadge}
           label="Anomalies"
@@ -2204,7 +2192,6 @@ function CrtEditableBlock({
 
 function CategoryBadge({
   assetId,
-  frameAssetId,
   className,
   src,
   label,
@@ -2217,13 +2204,6 @@ function CategoryBadge({
   assetId: Extract<
     LayoutAssetId,
     'catSpecies' | 'catArtifacts' | 'catEvents' | 'catAnomalies'
-  >;
-  frameAssetId: Extract<
-    LayoutAssetId,
-    | 'catSpeciesFrame'
-    | 'catArtifactsFrame'
-    | 'catEventsFrame'
-    | 'catAnomaliesFrame'
   >;
   className: string;
   src: string;
@@ -2238,40 +2218,35 @@ function CategoryBadge({
   ) => void;
 }) {
   return (
-    <>
-      <div
-        className={`crt-layout-offset crt-layout-offset--${frameAssetId}`}
-        style={getOffsetStyle(frameAssetId)}
+    <div
+      className={`crt-layout-offset crt-layout-offset--${assetId}`}
+      style={getOffsetStyle(assetId)}
+    >
+      <button
+        ref={(node) => setLayoutNode(assetId, node)}
+        className={`${className} layout-editable`}
+        style={getScaleStyle(assetId)}
+        data-layout-id={assetId}
+        type="button"
+        onClick={onClick}
+        onPointerDown={(event) => beginMove(event, assetId)}
+        aria-label={label}
       >
-        <div
-          ref={(node) => setLayoutNode(frameAssetId, node)}
-          className={`${className} cat-badge-frame layout-editable`}
-          style={getScaleStyle(frameAssetId)}
-          data-layout-id={frameAssetId}
-          onPointerDown={(event) => beginMove(event, frameAssetId)}
+        <img
+          className="cat-badge__content"
+          src={src}
+          alt=""
+          draggable="false"
+        />
+        <img
+          className="cat-badge__frame"
+          src={ASSETS.categoryHexFrame}
+          alt=""
           aria-hidden="true"
-        >
-          <img src={ASSETS.categoryHexFrame} alt="" draggable="false" />
-        </div>
-      </div>
-      <div
-        className={`crt-layout-offset crt-layout-offset--${assetId}`}
-        style={getOffsetStyle(assetId)}
-      >
-        <button
-          ref={(node) => setLayoutNode(assetId, node)}
-          className={`${className} layout-editable`}
-          style={getScaleStyle(assetId)}
-          data-layout-id={assetId}
-          type="button"
-          onClick={onClick}
-          onPointerDown={(event) => beginMove(event, assetId)}
-          aria-label={label}
-        >
-          <img src={src} alt="" draggable="false" />
-        </button>
-      </div>
-    </>
+          draggable="false"
+        />
+      </button>
+    </div>
   );
 }
 
