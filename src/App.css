@@ -1645,10 +1645,12 @@ button {
 }
 
 .crt-db-row__species-icon {
-  width: 118%;
-  height: 118%;
+  width: 100%;
+  height: 100%;
 
-  object-fit: cover;
+  /* Icons are normalized to a uniform square; contain keeps them all
+     the same size regardless of the creature/object aspect ratio. */
+  object-fit: contain;
 
   filter:
     var(--crt-green-normalize-strong)
