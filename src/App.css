@@ -27,12 +27,12 @@ button {
 }
 
 .app {
-  width: 100%;
-  min-height: 100vh;
+  width: var(--device-width);
+  min-height: 0;
   padding: 0;
 
-  display: flex;
-  flex-direction: column;
+  display: block;
+  overflow: hidden;
 
   color: var(--text);
 
@@ -542,11 +542,10 @@ button {
    ========================================================= */
 
 .device-stage {
-  min-height: 100vh;
-  flex: 1;
+  width: var(--device-width);
+  min-height: 0;
 
-  display: grid;
-  place-items: start center;
+  display: block;
 }
 
 .app-footer {
@@ -4172,7 +4171,7 @@ button {
 
 @media (max-width: 680px) {
   .app {
-    padding: 8px;
+    padding: 0;
   }
 
   .engineering-header {
