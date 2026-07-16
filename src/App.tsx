@@ -45,12 +45,20 @@ type Dossier = {
 
 const WOMBAT_DOSSIER_OVERRIDES: Record<string, Partial<Dossier>> = {
   'WMBT-017': {
-    name: 'THE GENTLEMAN',
+    name: 'BARON VON STANK',
     status: 'CONTAINED',
     classification: 'TIER III',
     date: '1987-04-12',
     summary:
       'Subject manifests only during periods of formal civic ceremony. Physical contact with subject results in compulsive politeness lasting 72 hours.',
+  },
+  'WMBT-018': {
+    name: 'THE SEPTIC PHILOSOPHER',
+    status: 'CONTAINED',
+    classification: 'TIER II',
+    date: '2024-04-22',
+    summary:
+      'Subject dispenses unsolicited life advice while wearing makeshift headgear. Personnel are advised not to engage in debates.',
   },
   'WMBT-022': {
     name: 'THE HOLLOW CHOIR',
@@ -62,21 +70,46 @@ const WOMBAT_DOSSIER_OVERRIDES: Record<string, Partial<Dossier>> = {
   },
 };
 
-const DOSSIERS: Dossier[] = Array.from({ length: 13 }, (_, index) => {
-  const dossierNumber = String(index + 10).padStart(3, '0');
-  const id = `WMBT-${dossierNumber}`;
+const GENERATED_WOMBAT_DOSSIERS: Dossier[] = Array.from(
+  { length: 13 },
+  (_, index) => {
+    const dossierNumber = String(index + 10).padStart(3, '0');
+    const id = `WMBT-${dossierNumber}`;
 
-  return {
-    id,
-    name: `WOMBAT SPECIMEN ${dossierNumber}`,
-    status: 'INDEXED',
-    classification: 'TIER I',
-    date: `1988-01-${String(index + 1).padStart(2, '0')}`,
+    return {
+      id,
+      name: `WOMBAT SPECIMEN ${dossierNumber}`,
+      status: 'INDEXED',
+      classification: 'TIER I',
+      date: `1988-01-${String(index + 1).padStart(2, '0')}`,
+      summary:
+        'Species archive shell generated for restricted retrieval testing. Full biological record requires bay authorization.',
+      ...WOMBAT_DOSSIER_OVERRIDES[id],
+    };
+  },
+);
+
+const DOSSIERS: Dossier[] = [
+  {
+    id: 'WMBT-001',
+    name: 'THE UNIT',
+    status: 'CONTAINED',
+    classification: 'UNCLASSIFIED FILTH',
+    date: '2026-06-29',
     summary:
-      'Species archive shell generated for restricted retrieval testing. Full biological record requires bay authorization.',
-    ...WOMBAT_DOSSIER_OVERRIDES[id],
-  };
-});
+      'Flexing in Area 7. Staff are advised that muscle mass overrides authority.',
+  },
+  {
+    id: 'WMBT-007',
+    name: 'THE CHIEF EXECUTIVE WOMBAT',
+    status: 'CONTAINED',
+    classification: 'EXECUTIVE CLASS',
+    date: '2026-07-14',
+    summary:
+      'Specimen exhibits domineering posture, territorial office behavior, and persistent administrative overreach.',
+  },
+  ...GENERATED_WOMBAT_DOSSIERS,
+];
 
 type CategoryEntry = {
   id: string;
@@ -152,6 +185,12 @@ const ASSETS = {
   artifactPatterningNailClippers: `${ASSET_ROOT}/artifact_patterning_nail_clippers.png`,
   artifactIncommensurateMeasuringStick: `${ASSET_ROOT}/artifact_incommensurate_measuring_stick.png`,
   artifactPreemptiveTissueDispenser: `${ASSET_ROOT}/artifact_preemptive_tissue_dispenser.png`,
+  artifactCharles: `${ASSET_ROOT}/artifact_charles.png`,
+  dossierBaronVonStank: `${ASSET_ROOT}/dossier_baron_von_stank.png`,
+  dossierSepticPhilosopher: `${ASSET_ROOT}/dossier_septic_philosopher.png`,
+  dossierTheUnit: `${ASSET_ROOT}/dossier_the_unit.png`,
+  dossierCharlesArtifact: `${ASSET_ROOT}/dossier_charles_artifact.png`,
+  dossierChiefExecutiveWombat: `${ASSET_ROOT}/dossier_chief_executive_wombat.png`,
 
   categoryHexFrame: `${ASSET_ROOT}/category_hex_frame.png`,
   speciesBadge: `${ASSET_ROOT}/category_species_icon.png`,
@@ -178,7 +217,7 @@ const SPECIES_DATABASE: CategoryEntry[] = [
   {
     id: '03',
     name: 'WOMBATS',
-    count: 17,
+    count: DOSSIERS.length,
     icon: ASSETS.speciesWombatIcon,
     target: 'wombats',
   },
@@ -325,6 +364,15 @@ const ARTIFACT_DOSSIERS: Dossier[] = [
     date: '2015-01-11',
     summary:
       'Dispenser presents tissues shortly before sneezes, heartbreak, or unexpected mayonnaise incidents.',
+  },
+  {
+    id: 'ARTF-022',
+    name: 'CHARLES',
+    status: 'CONTAINED',
+    classification: 'OBJECT / PSY-INFLUENCE',
+    date: '2026-06-19',
+    summary:
+      'Ham and Swiss sandwich exerts a non-verbal influence causing observers to agree that the artifact must be referred to as Charles.',
   },
 ];
 
@@ -536,16 +584,14 @@ const ARTIFACTS_DATABASE: CategoryEntry[] = [
     icon: ASSETS.artifactPreemptiveTissueDispenser,
     dossierId: 'ARTF-014',
   },
+  {
+    id: '15',
+    name: 'CHARLES',
+    count: 1,
+    icon: ASSETS.artifactCharles,
+    dossierId: 'ARTF-022',
+  },
 ];
-
-const STATUS_LABELS: Record<BayState, string> = {
-  closed: 'CLOSED',
-  unlocking: 'UNLOCKING',
-  opening: 'OPENING',
-  open: 'OPEN',
-  closing: 'CLOSING',
-  locking: 'LOCKING',
-};
 
 const UNLOCK_DURATION_MS = 380;
 const DOOR_DURATION_MS = 600;
@@ -556,13 +602,7 @@ const BOOT_LOADING_DURATION_MS = 2800;
 const BOOT_GRANTED_DURATION_MS = 1000;
 const RETRIEVAL_MIN_DURATION_MS = 1000;
 const RETRIEVAL_MAX_DURATION_MS = 3000;
-const LAYOUT_STORAGE_KEY = 'dars-1a-layout-adjustments-v2';
-const PROTECTED_LAYOUT_ASSET_IDS = [
-  'buttonMenu',
-  'buttonArchive',
-  'buttonBack',
-] as const satisfies readonly LayoutAssetId[];
-
+const LAYOUT_STORAGE_KEY = 'dars-1a-layout-adjustments-v3';
 const LAYOUT_ASSETS = [
   { id: 'crt', label: 'CRT Screen' },
   { id: 'deviceHeader', label: 'Display Header' },
@@ -648,21 +688,21 @@ type LayoutCssProperties = CSSProperties & {
  * A saved layout in localStorage still overrides these per-asset.
  */
 const DEFAULT_LAYOUT: LayoutState = {
-  crt: { x: 0.384, y: 0.31, scale: 1, width: 1, height: 0.83 },
-  deviceHeader: { x: 0, y: 1.442, scale: 1, width: 1.01, height: 1 },
-  warningBanner: { x: 0.77, y: 4.539, scale: 1, width: 1.1, height: 1 },
-  crtTitleLine: { x: 0, y: -9.042, scale: 1, width: 0.96, height: 1.24 },
-  crtLeftPanel: { x: -3.042, y: 7.157, scale: 1.183, width: 1, height: 1 },
-  crtRightTopPanel: { x: 3.347, y: 9.543, scale: 1.167, width: 1, height: 1.38 },
-  crtRightBottomPanel: { x: 3.345, y: 12.61, scale: 1, width: 1.16, height: 1 },
+  crt: { x: -0.001, y: 1.547, scale: 1, width: 1, height: 1 },
+  deviceHeader: { x: 0.002, y: 1.652, scale: 1.03, width: 1, height: 1 },
+  warningBanner: { x: 0.1, y: -945.432, scale: 2.73, width: 1, height: 1 },
+  crtTitleLine: { x: -0.605, y: 2.047, scale: 0.56, width: 1.64, height: 1.49 },
+  crtLeftPanel: { x: -0.609, y: 4.43, scale: 1.025, width: 1, height: 1 },
+  crtRightTopPanel: { x: 4.259, y: 6.475, scale: 1, width: 1, height: 1 },
+  crtRightBottomPanel: { x: 1.826, y: 4.771, scale: 0.898, width: 1, height: 1 },
   catSpecies: { x: -5.234, y: 8.212, scale: 1.21, width: 1, height: 1.15 },
   catArtifacts: { x: 3.651, y: 8.623, scale: 1.19, width: 0.99, height: 1.22 },
   catEvents: { x: -4.869, y: 17.799, scale: 1.15, width: 1.01, height: 1.18 },
   catAnomalies: { x: 3.954, y: 17.31, scale: 1.15, width: 1.01, height: 1.16 },
-  rearBay: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  rearBay: { x: 0, y: -0.412, scale: 1, width: 1, height: 1 },
   bayCavity: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
-  bayRailLeft: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
-  bayRailRight: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  bayRailLeft: { x: -5.5, y: 0, scale: 1, width: 1, height: 1 },
+  bayRailRight: { x: 9.25, y: 0, scale: 1, width: 1, height: 1 },
   bayShadow: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   bayFrame: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   shell: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
@@ -672,11 +712,11 @@ const DEFAULT_LAYOUT: LayoutState = {
   doorLower: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   latch: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   shellOuterMask: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
-  guideLightTop: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
-  guideLightBottom: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
-  buttonMenu: { x: -1.923, y: 2.888, scale: 1.44, width: 0.97, height: 1.09 },
-  buttonArchive: { x: 6.537, y: 3.609, scale: 1.732, width: 1.03, height: 1.14 },
-  buttonBack: { x: 8.46, y: 3.3, scale: 1.849, width: 1.02, height: 1 },
+  guideLightTop: { x: -0.769, y: 9.794, scale: 1.89, width: 0.56, height: 1 },
+  guideLightBottom: { x: 0, y: 1.857, scale: 2.16, width: 0.49, height: 1 },
+  buttonMenu: { x: -1.924, y: 2.579, scale: 1.41, width: 1, height: 1 },
+  buttonArchive: { x: 6.729, y: 3.198, scale: 1.78, width: 1, height: 1 },
+  buttonBack: { x: 7.5, y: 2.991, scale: 1.7, width: 1, height: 1 },
 };
 
 function createDefaultLayout(): LayoutState {
@@ -730,13 +770,12 @@ function roundLayoutValue(value: number): number {
 
 function App() {
   const [bayState, setBayState] = useState<BayState>('closed');
-  const [editMode, setEditMode] = useState(false);
+  const [editMode] = useState(false);
   const [selectedAssetId, setSelectedAssetId] =
     useState<LayoutAssetId>('buttonArchive');
   const [layout, setLayout] = useState<LayoutState>(loadSavedLayout);
   const [selectionRect, setSelectionRect] =
     useState<SelectionRect | null>(null);
-  const [copyStatus, setCopyStatus] = useState('');
   const [screen, setScreen] = useState<ScreenId>('home');
   const [bootPhase, setBootPhase] = useState<BootPhase>('flicker');
   const [bootProgress, setBootProgress] = useState(0);
@@ -751,6 +790,10 @@ function App() {
   const [pendingNavigation, setPendingNavigation] = useState<ScreenId | null>(
     null,
   );
+  const [activeDossierSheet, setActiveDossierSheet] = useState<{
+    src: string;
+    title: string;
+  } | null>(null);
 
   const deviceRef = useRef<HTMLElement | null>(null);
   const timersRef = useRef<number[]>([]);
@@ -763,15 +806,12 @@ function App() {
     bayState === 'closing' ||
     bayState === 'locking';
 
-  const selectedAdjustment = layout[selectedAssetId];
   const selectedDossier =
     ALL_DOSSIERS.find((dossier) => dossier.id === selectedDossierId) ?? null;
   const isAssetReady = Boolean(selectedDossier);
+  const selectedDossierSheetSrc = getDossierSheetSrc(selectedDossier?.id);
   const areGuideLightsActive =
     bootPhase === 'granted' || bootPhase === 'ready';
-  const isProtectedLayoutAsset = PROTECTED_LAYOUT_ASSET_IDS.includes(
-    selectedAssetId as (typeof PROTECTED_LAYOUT_ASSET_IDS)[number],
-  );
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((timerId) => window.clearTimeout(timerId));
@@ -847,11 +887,32 @@ function App() {
       return;
     }
 
+    setActiveDossierSheet(null);
     clearTimers();
     setBayState('closing');
     schedule(() => setBayState('locking'), DOOR_DURATION_MS);
     schedule(() => setBayState('closed'), DOOR_DURATION_MS + LOCK_DURATION_MS);
   }, [bayState, clearTimers, editMode, schedule]);
+
+  const closeDossierSheet = useCallback(() => {
+    setActiveDossierSheet(null);
+  }, []);
+
+  const openDossierSheet = useCallback(() => {
+    if (
+      editMode ||
+      bayState !== 'open' ||
+      !selectedDossier ||
+      !selectedDossierSheetSrc
+    ) {
+      return;
+    }
+
+    setActiveDossierSheet({
+      src: selectedDossierSheetSrc,
+      title: selectedDossier.name,
+    });
+  }, [bayState, editMode, selectedDossier, selectedDossierSheetSrc]);
 
   const beginRetrieval = useCallback(
     (returnScreen: ScreenId, showDossierScreen: boolean) => {
@@ -900,6 +961,7 @@ function App() {
         return;
       }
 
+      setActiveDossierSheet(null);
       beginRetrieval(dossierReturnScreen, dossierReturnScreen !== 'objects');
       return;
     }
@@ -907,6 +969,7 @@ function App() {
     if (bayState === 'open') {
       const returnDestination = dossierReturnScreen;
 
+      setActiveDossierSheet(null);
       setDeliveryPhase(null);
       setSelectedDossierId(null);
       setDossierReturnScreen('wombats');
@@ -934,6 +997,7 @@ function App() {
     }
 
     setDeliveryPhase(null);
+    setActiveDossierSheet(null);
 
     if (bayState === 'open') {
       setPendingNavigation('home');
@@ -951,6 +1015,7 @@ function App() {
 
     setDossierReturnScreen(getDossierRegistryScreen(id));
     setDeliveryPhase(null);
+    setActiveDossierSheet(null);
     setSelectedDossierId(id);
   }, [isBusy]);
 
@@ -966,6 +1031,7 @@ function App() {
 
       setDossierReturnScreen(returnScreen);
       setSelectedDossierId(id);
+      setActiveDossierSheet(null);
 
       if (showDossierScreen) {
         setScreen('dossier');
@@ -981,6 +1047,7 @@ function App() {
       }
 
       setDeliveryPhase(null);
+      setActiveDossierSheet(null);
       setSelectedDossierId(null);
       setDossierReturnScreen('wombats');
       setScreen(nextScreen);
@@ -1026,10 +1093,12 @@ function App() {
     }
 
     setDeliveryPhase(null);
+    setActiveDossierSheet(null);
 
     if (bayState === 'open') {
       const returnDestination = dossierReturnScreen;
 
+      setActiveDossierSheet(null);
       setDeliveryPhase(null);
       setSelectedDossierId(null);
       setDossierReturnScreen('wombats');
@@ -1074,7 +1143,6 @@ function App() {
       const adjustment = layout[assetId];
 
       setSelectedAssetId(assetId);
-      setCopyStatus('');
       pointerOperationRef.current = {
         mode: 'move',
         assetId,
@@ -1138,42 +1206,6 @@ function App() {
     [beginMove, editMode],
   );
 
-  const toggleEditMode = useCallback(() => {
-    clearTimers();
-    pointerOperationRef.current = null;
-    setBayState('closed');
-    setCopyStatus('');
-    setEditMode((currentEditMode) => !currentEditMode);
-  }, [clearTimers]);
-
-  const resetSelectedAsset = useCallback(() => {
-    if (PROTECTED_LAYOUT_ASSET_IDS.includes(
-      selectedAssetId as (typeof PROTECTED_LAYOUT_ASSET_IDS)[number],
-    )) {
-      setCopyStatus('Locked production geometry cannot be reset.');
-      return;
-    }
-
-    updateAsset(selectedAssetId, {
-      x: 0,
-      y: 0,
-      scale: 1,
-      width: 1,
-      height: 1,
-    });
-    setCopyStatus('');
-  }, [selectedAssetId, updateAsset]);
-
-  const resetAllAssets = useCallback(() => {
-    const nextLayout = createDefaultLayout();
-    nextLayout.buttonMenu = layout.buttonMenu;
-    nextLayout.buttonArchive = layout.buttonArchive;
-    nextLayout.buttonBack = layout.buttonBack;
-    window.localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(nextLayout));
-    setLayout(nextLayout);
-    setCopyStatus('');
-  }, [layout]);
-
   const nudgeSelectedAsset = useCallback(
     (pixelX: number, pixelY: number) => {
       const selectedNode = layoutNodesRef.current.get(selectedAssetId);
@@ -1197,17 +1229,6 @@ function App() {
     },
     [selectedAssetId, updateAsset],
   );
-
-  const copyLayoutJson = useCallback(async () => {
-    const layoutJson = JSON.stringify(layout, null, 2);
-
-    try {
-      await navigator.clipboard.writeText(layoutJson);
-      setCopyStatus('Layout copied.');
-    } catch {
-      setCopyStatus(layoutJson);
-    }
-  }, [layout]);
 
   const refreshSelectionRect = useCallback(() => {
     if (!editMode) {
@@ -1421,231 +1442,6 @@ function App() {
 
   return (
     <div className="app">
-      <header className="engineering-header">
-        <div className="archive-header-unit">
-          <div className="archive-status-strip">
-            <div className="archive-battery" aria-label="Battery 87 percent">
-              <span className="archive-battery__cell" />
-              <span>87%</span>
-            </div>
-
-            <strong>SECURE LINK</strong>
-
-            <div className="archive-signal" aria-label="Signal strong">
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-
-          <div className="archive-plaque archive-plaque--header">
-            <div className="archive-seal" aria-hidden="true">
-              <span />
-            </div>
-
-            <div className="archive-plaque__title">
-              <span>DIRECTORATE ARCHIVE</span>
-              <span>RETRIEVAL SYSTEM</span>
-            </div>
-
-            <div className="archive-plaque__tag">DARS-1A</div>
-          </div>
-        </div>
-
-        <div>
-          <p className="engineering-kicker">DARS-1A ENGINEERING TEST</p>
-          <h1>Retrieval Bay Prototype</h1>
-        </div>
-
-        <div className="engineering-controls">
-          <div
-            className={`state-indicator state-indicator--${bayState}`}
-            role="status"
-            aria-live="polite"
-          >
-            {editMode ? 'EDITING' : STATUS_LABELS[bayState]}
-          </div>
-
-          <button
-            className="control-button control-button--secondary"
-            type="button"
-            onClick={toggleEditMode}
-            aria-pressed={editMode}
-          >
-            {editMode ? 'Exit Layout' : 'Edit Layout'}
-          </button>
-
-          <button
-            className="control-button"
-            type="button"
-            onClick={handleArchive}
-            disabled={isBusy || editMode || deliveryPhase === 'retrieving'}
-          >
-            {bayState === 'open' ? 'Close Bay' : 'Open Bay'}
-          </button>
-        </div>
-      </header>
-
-      {editMode && (
-        <aside className="layout-editor" aria-label="Layout editor">
-          <div className="layout-editor__heading">
-            <div>
-              <p>LAYOUT CALIBRATION</p>
-              <strong>
-                {
-                  LAYOUT_ASSETS.find(({ id }) => id === selectedAssetId)
-                    ?.label
-                }
-              </strong>
-            </div>
-            <span>AUTO-SAVED</span>
-          </div>
-
-          <label className="layout-field layout-field--wide">
-            <span>Asset</span>
-            <select
-              value={selectedAssetId}
-              onChange={(event) => {
-                setSelectedAssetId(event.target.value as LayoutAssetId);
-                setCopyStatus('');
-              }}
-            >
-              {LAYOUT_ASSETS.map(({ id, label }) => (
-                <option key={id} value={id}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="layout-editor__values">
-            <label className="layout-field">
-              <span>X %</span>
-              <input
-                type="number"
-                step="0.1"
-                value={selectedAdjustment.x}
-                onChange={(event) => {
-                  updateAsset(selectedAssetId, {
-                    x: Number(event.target.value) || 0,
-                  });
-                }}
-              />
-            </label>
-
-            <label className="layout-field">
-              <span>Y %</span>
-              <input
-                type="number"
-                step="0.1"
-                value={selectedAdjustment.y}
-                onChange={(event) => {
-                  updateAsset(selectedAssetId, {
-                    y: Number(event.target.value) || 0,
-                  });
-                }}
-              />
-            </label>
-
-            <label className="layout-field">
-              <span>Scale</span>
-              <input
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.01"
-                value={selectedAdjustment.scale}
-                onChange={(event) => {
-                  updateAsset(selectedAssetId, {
-                    scale: Math.min(
-                      5,
-                      Math.max(0.1, Number(event.target.value) || 1),
-                    ),
-                  });
-                }}
-              />
-            </label>
-
-            <label className="layout-field">
-              <span>Width</span>
-              <input
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.01"
-                value={selectedAdjustment.width}
-                onChange={(event) => {
-                  updateAsset(selectedAssetId, {
-                    width: Math.min(
-                      5,
-                      Math.max(0.1, Number(event.target.value) || 1),
-                    ),
-                  });
-                }}
-              />
-            </label>
-
-            <label className="layout-field">
-              <span>Height</span>
-              <input
-                type="number"
-                min="0.1"
-                max="5"
-                step="0.01"
-                value={selectedAdjustment.height}
-                onChange={(event) => {
-                  updateAsset(selectedAssetId, {
-                    height: Math.min(
-                      5,
-                      Math.max(0.1, Number(event.target.value) || 1),
-                    ),
-                  });
-                }}
-              />
-            </label>
-          </div>
-
-          <div className="layout-nudge" aria-label="Nudge selected asset">
-            <button type="button" onClick={() => nudgeSelectedAsset(0, -1)}>
-              Up
-            </button>
-            <button type="button" onClick={() => nudgeSelectedAsset(-1, 0)}>
-              Left
-            </button>
-            <button type="button" onClick={() => nudgeSelectedAsset(1, 0)}>
-              Right
-            </button>
-            <button type="button" onClick={() => nudgeSelectedAsset(0, 1)}>
-              Down
-            </button>
-          </div>
-
-          <div className="layout-editor__actions">
-            <button type="button" onClick={resetSelectedAsset}>
-              {isProtectedLayoutAsset ? 'Selected Locked' : 'Reset Selected'}
-            </button>
-            <button type="button" onClick={resetAllAssets}>
-              Reset All
-            </button>
-            <button type="button" onClick={copyLayoutJson}>
-              Copy Layout JSON
-            </button>
-          </div>
-
-          <p className="layout-editor__help">
-            Drag an asset to move it. Drag the square handle to resize.
-            Arrow keys nudge one pixel; Shift + Arrow nudges ten.
-          </p>
-
-          {copyStatus && (
-            <p className="layout-editor__status" role="status">
-              {copyStatus}
-            </p>
-          )}
-        </aside>
-      )}
-
       <main className="device-stage">
         <section
           ref={deviceRef}
@@ -1784,6 +1580,7 @@ function App() {
             getScaleStyle={getScaleStyle}
             setLayoutNode={setLayoutNode}
             beginMove={beginMove}
+            onClick={openDossierSheet}
           />
 
           <FrontBay
@@ -1808,7 +1605,7 @@ function App() {
 
           <DeviceLayer
             assetId="guideLightTop"
-            className="layout-offset--guide-light"
+            className="layout-offset--guide-light-top"
             getOffsetStyle={getOffsetStyle}
           >
             <span
@@ -1825,7 +1622,7 @@ function App() {
 
           <DeviceLayer
             assetId="guideLightBottom"
-            className="layout-offset--guide-light"
+            className="layout-offset--guide-light-bottom"
             getOffsetStyle={getOffsetStyle}
           >
             <span
@@ -1924,6 +1721,28 @@ function App() {
           )}
         </section>
       </main>
+
+      {activeDossierSheet && (
+        <div
+          className="dossier-sheet-viewer"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${activeDossierSheet.title} dossier`}
+        >
+          <button
+            className="dossier-sheet-viewer__close"
+            type="button"
+            onClick={closeDossierSheet}
+          >
+            Close
+          </button>
+          <img
+            src={activeDossierSheet.src}
+            alt={`${activeDossierSheet.title} dossier`}
+            draggable="false"
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -1956,6 +1775,7 @@ function ImageLayer({
   setLayoutNode,
   beginMove,
   passive = false,
+  onClick,
 }: {
   assetId: LayoutAssetId;
   wrapperClassName: string;
@@ -1969,6 +1789,7 @@ function ImageLayer({
     assetId: LayoutAssetId,
   ) => void;
   passive?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <DeviceLayer
@@ -1986,6 +1807,7 @@ function ImageLayer({
         aria-hidden={passive}
         draggable="false"
         onPointerDown={(event) => beginMove(event, assetId)}
+        onClick={onClick}
       />
     </DeviceLayer>
   );
@@ -2287,6 +2109,23 @@ function getDossierRegistryScreen(dossierId: string): ScreenId {
   }
 
   return 'wombats';
+}
+
+function getDossierSheetSrc(dossierId?: string | null): string | null {
+  switch (dossierId) {
+    case 'WMBT-001':
+      return ASSETS.dossierTheUnit;
+    case 'WMBT-007':
+      return ASSETS.dossierChiefExecutiveWombat;
+    case 'WMBT-017':
+      return ASSETS.dossierBaronVonStank;
+    case 'WMBT-018':
+      return ASSETS.dossierSepticPhilosopher;
+    case 'ARTF-022':
+      return ASSETS.dossierCharlesArtifact;
+    default:
+      return null;
+  }
 }
 
 function getRegistryDossiers(screen: ScreenId, fallbackDossiers: Dossier[]) {

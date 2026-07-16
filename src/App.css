@@ -29,7 +29,7 @@ button {
 .app {
   width: 100%;
   min-height: 100vh;
-  padding: 10px;
+  padding: 0;
 
   display: flex;
   flex-direction: column;
@@ -542,7 +542,7 @@ button {
    ========================================================= */
 
 .device-stage {
-  min-height: 720px;
+  min-height: 100vh;
   flex: 1;
 
   display: grid;
@@ -879,7 +879,9 @@ button {
   z-index: 120;
 }
 
-.layout-offset--guide-light {
+.layout-offset--guide-light,
+.layout-offset--guide-light-top,
+.layout-offset--guide-light-bottom {
   z-index: 126;
 }
 
@@ -3653,6 +3655,11 @@ button {
     scale(1);
 }
 
+.dars-device--open .bay-folder {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .dars-device--closed .bay-folder,
 .dars-device--unlocking .bay-folder,
 .dars-device--locking .bay-folder {
@@ -3868,12 +3875,72 @@ button {
 
 .dars-device.layout-editing .bay-folder {
   opacity: 1 !important;
+  pointer-events: auto;
   transition: none !important;
 
   transform:
     translateX(-50%)
     translateY(0)
     scale(1) !important;
+}
+
+.dossier-sheet-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  padding: clamp(0.75rem, 2vw, 1.75rem);
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(21, 61, 19, 0.36),
+      rgba(0, 0, 0, 0.92) 72%
+    );
+  backdrop-filter: blur(2px);
+}
+
+.dossier-sheet-viewer img {
+  display: block;
+
+  max-width: min(96vw, 96rem);
+  max-height: 92vh;
+
+  object-fit: contain;
+
+  border: 1px solid rgba(114, 255, 73, 0.38);
+  box-shadow:
+    0 0 2.4rem rgba(114, 255, 73, 0.22),
+    0 1.8rem 4rem rgba(0, 0, 0, 0.72);
+}
+
+.dossier-sheet-viewer__close {
+  position: absolute;
+  top: clamp(0.75rem, 2vw, 1.5rem);
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  z-index: 1;
+
+  padding: 0.55rem 0.9rem;
+
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--crt-green);
+  border: 1px solid rgba(114, 255, 73, 0.65);
+  background: rgba(3, 21, 5, 0.92);
+  box-shadow: 0 0 1rem rgba(114, 255, 73, 0.2);
+  cursor: pointer;
+}
+
+.dossier-sheet-viewer__close:hover {
+  color: #e6ffd5;
+  border-color: rgba(172, 255, 138, 0.95);
 }
 
 /* =========================================================
