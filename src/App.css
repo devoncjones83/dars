@@ -2267,8 +2267,8 @@ button {
 }
 
 .crt-asset-status--dispensed {
-  gap: 0.35em;
-  padding: 2.2% 3% 18%;
+  gap: 0.2em;
+  padding: 0.5% 1.5% 15%;
 
   text-align: center;
 }
@@ -2283,8 +2283,8 @@ button {
 }
 
 .crt-asset-status__icon--dispensed {
-  width: min(96%, 560px);
-  max-height: 68%;
+  width: min(168%, 980px);
+  max-height: 84%;
 
   object-fit: contain;
   filter:
