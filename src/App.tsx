@@ -24,10 +24,15 @@ type ScreenId =
   | 'objects'
   | 'events'
   | 'anomalies'
+  | 'corvids'
+  | 'bullfrogs'
   | 'wombats'
+  | 'nutrias'
+  | 'platypus'
   | 'dossier';
 
 type BootPhase = 'flicker' | 'display' | 'loading' | 'granted' | 'ready';
+type DeliveryPhase = 'retrieving' | 'retrieved';
 
 type Dossier = {
   id: string;
@@ -120,6 +125,11 @@ const ASSETS = {
   containmentFolder: `${ASSET_ROOT}/containment_record_folder.png`,
 
   recordIcon: `${ASSET_ROOT}/record_icon.png`,
+  wombatDispensedIcon: `${ASSET_ROOT}/wombat_dispensed_icon.png`,
+  bullfrogDispensedIcon: `${ASSET_ROOT}/dispense_bullfrog_icon.png`,
+  corvidDispensedIcon: `${ASSET_ROOT}/dispense_corvid_icon.png`,
+  nutriaDispensedIcon: `${ASSET_ROOT}/dispense_nutria_icon.png`,
+  platypusDispensedIcon: `${ASSET_ROOT}/dispense_platypus_icon.png`,
   speciesIcon: `${ASSET_ROOT}/species_icon.png`,
   speciesWombatIcon: `${ASSET_ROOT}/species_wombat_icon.png`,
   speciesCorvidIcon: `${ASSET_ROOT}/species_corvid_icon.png`,
@@ -134,6 +144,14 @@ const ASSETS = {
   artifactDairyAnomaly: `${ASSET_ROOT}/artifact_dairy_anomaly.png`,
   artifactBucketThatKnows: `${ASSET_ROOT}/artifact_bucket_that_knows.png`,
   artifactUnflushableBowl: `${ASSET_ROOT}/artifact_unflushable_bowl.png`,
+  artifactColdStorageUnit: `${ASSET_ROOT}/artifact_cold_storage_unit.png`,
+  artifactIsolationMembrane: `${ASSET_ROOT}/artifact_isolation_membrane.png`,
+  artifactAbsorbentTextile: `${ASSET_ROOT}/artifact_absorbent_textile.png`,
+  artifactUnauthorizedAubergine: `${ASSET_ROOT}/artifact_unauthorized_aubergine.png`,
+  artifactDisplacedImpactHammer: `${ASSET_ROOT}/artifact_displaced_impact_hammer.png`,
+  artifactPatterningNailClippers: `${ASSET_ROOT}/artifact_patterning_nail_clippers.png`,
+  artifactIncommensurateMeasuringStick: `${ASSET_ROOT}/artifact_incommensurate_measuring_stick.png`,
+  artifactPreemptiveTissueDispenser: `${ASSET_ROOT}/artifact_preemptive_tissue_dispenser.png`,
 
   categoryHexFrame: `${ASSET_ROOT}/category_hex_frame.png`,
   speciesBadge: `${ASSET_ROOT}/category_species_icon.png`,
@@ -143,8 +161,20 @@ const ASSETS = {
 } as const;
 
 const SPECIES_DATABASE: CategoryEntry[] = [
-  { id: '01', name: 'CORVIDS', count: 13, icon: ASSETS.speciesCorvidIcon },
-  { id: '02', name: 'BULLFROGS', count: 9, icon: ASSETS.speciesBullfrogIcon },
+  {
+    id: '01',
+    name: 'CORVIDS',
+    count: 3,
+    icon: ASSETS.speciesCorvidIcon,
+    target: 'corvids',
+  },
+  {
+    id: '02',
+    name: 'BULLFROGS',
+    count: 3,
+    icon: ASSETS.speciesBullfrogIcon,
+    target: 'bullfrogs',
+  },
   {
     id: '03',
     name: 'WOMBATS',
@@ -155,15 +185,16 @@ const SPECIES_DATABASE: CategoryEntry[] = [
   {
     id: '04',
     name: 'NUTRIAS (GROSS)',
-    count: 8,
+    count: 3,
     icon: ASSETS.speciesNutriaIcon,
+    target: 'nutrias',
   },
   {
     id: '05',
     name: 'PLATYPUS',
     count: 1,
     icon: ASSETS.speciesPlatypusIcon,
-    dossierId: 'PLTY-001',
+    target: 'platypus',
   },
   { id: '06', name: 'UNKNOWN / REDACTED', count: 0, locked: true },
 ];
@@ -223,11 +254,83 @@ const ARTIFACT_DOSSIERS: Dossier[] = [
     summary:
       'Fixture resists all disposal attempts. Archive recommends acknowledging its victory before engaging secondary containment.',
   },
+  {
+    id: 'ARTF-007',
+    name: 'FLEXIBLE ELASTOMERIC ISOLATION MEMBRANE',
+    status: 'INDEXED',
+    classification: 'OBJECT / BARRIER',
+    date: '2004-08-12',
+    summary:
+      'Membrane displays inconsistent dimensional loyalty and refuses to be categorized by conventional procurement language.',
+  },
+  {
+    id: 'ARTF-008',
+    name: 'UNAUTHORIZED AUBERGINE',
+    status: 'QUARANTINED',
+    classification: 'OBJECT / AGRICULTURAL',
+    date: '2011-04-23',
+    summary:
+      'Produce item manifests in restricted areas without badge access. Culinary personnel deny responsibility.',
+  },
+  {
+    id: 'ARTF-009',
+    name: 'COLD STORAGE UNIT 8',
+    status: 'INDEXED',
+    classification: 'OBJECT / THERMAL',
+    date: '1999-12-08',
+    summary:
+      'Refrigeration unit maintains impossible interior volume and chills only items it considers sufficiently suspicious.',
+  },
+  {
+    id: 'ARTF-010',
+    name: 'ABSORBENT TEXTILE 6-B',
+    status: 'MONITORED',
+    classification: 'OBJECT / HYDROPHILIC',
+    date: '2007-03-16',
+    summary:
+      'Textile absorbs moisture, apologies, and poorly phrased orders. Wringing produces classified condensation.',
+  },
+  {
+    id: 'ARTF-011',
+    name: 'DISPLACED-IMPACT HAMMER',
+    status: 'CONTAINED',
+    classification: 'OBJECT / KINETIC',
+    date: '1988-08-31',
+    summary:
+      'Hammer impact is delivered three to nine seconds before the swing that causes it. Eye protection is mandatory before intent forms.',
+  },
+  {
+    id: 'ARTF-012',
+    name: 'PATTERNING NAIL CLIPPERS',
+    status: 'INDEXED',
+    classification: 'OBJECT / KERATIN',
+    date: '2003-05-24',
+    summary:
+      'Clippers trim nails into repeating symbols that accurately predict which drawer contains missing batteries.',
+  },
+  {
+    id: 'ARTF-013',
+    name: 'INCOMMENSURATE MEASURING STICK',
+    status: 'MONITORED',
+    classification: 'OBJECT / METRIC',
+    date: '1974-10-02',
+    summary:
+      'Measuring stick returns values that are internally consistent but incompatible with all known unit systems.',
+  },
+  {
+    id: 'ARTF-014',
+    name: 'PREEMPTIVE TISSUE DISPENSER',
+    status: 'INDEXED',
+    classification: 'OBJECT / ANTICIPATORY',
+    date: '2015-01-11',
+    summary:
+      'Dispenser presents tissues shortly before sneezes, heartbreak, or unexpected mayonnaise incidents.',
+  },
 ];
 
 const PLATYPUS_DOSSIER: Dossier = {
   id: 'PLTY-001',
-  name: 'PLATYPUS SPECIMEN 001',
+  name: 'FATHER BILGEMOUTH',
   status: 'INDEXED',
   classification: 'TIER I',
   date: '1992-07-18',
@@ -235,8 +338,101 @@ const PLATYPUS_DOSSIER: Dossier = {
     'Single-entry species record. Subject displays improbable composure and refuses all conventional taxonomy jokes.',
 };
 
+const CORVID_DOSSIERS: Dossier[] = [
+  {
+    id: 'CRVD-001',
+    name: 'THE RAFTER WATCHER',
+    status: 'INDEXED',
+    classification: 'TIER I',
+    date: '1984-03-11',
+    summary:
+      'Subject observes archive staff from elevated structures and repeats overheard security phrases at inconvenient times.',
+  },
+  {
+    id: 'CRVD-002',
+    name: 'MIDNIGHT ACCOUNTANT',
+    status: 'MONITORED',
+    classification: 'TIER II',
+    date: '1990-10-04',
+    summary:
+      'Corvid entity rearranges numerical records into accurate but deeply insulting budget forecasts.',
+  },
+  {
+    id: 'CRVD-003',
+    name: 'THE GLASS BEAK',
+    status: 'CONTAINED',
+    classification: 'TIER II',
+    date: '1996-05-22',
+    summary:
+      'Specimen can peck through reflective surfaces only when unobserved by the assigned handler.',
+  },
+];
+
+const BULLFROG_DOSSIERS: Dossier[] = [
+  {
+    id: 'BFRG-001',
+    name: 'BARON BOGTHROAT',
+    status: 'CONTAINED',
+    classification: 'TIER I',
+    date: '1981-06-19',
+    summary:
+      'Vocalizations cause nearby paperwork to become damp, notarized, and legally binding.',
+  },
+  {
+    id: 'BFRG-002',
+    name: 'THE POND NOTARY',
+    status: 'INDEXED',
+    classification: 'TIER I',
+    date: '1989-09-03',
+    summary:
+      'Specimen witnesses verbal agreements and produces stamped lily pads within thirty seconds.',
+  },
+  {
+    id: 'BFRG-003',
+    name: 'MISTER CROAKWISE',
+    status: 'MONITORED',
+    classification: 'TIER II',
+    date: '1997-02-15',
+    summary:
+      'Answers direct questions with unsettlingly useful advice, followed by thunder in enclosed rooms.',
+  },
+];
+
+const NUTRIA_DOSSIERS: Dossier[] = [
+  {
+    id: 'NTRI-001',
+    name: 'THE DITCH COUNT',
+    status: 'MONITORED',
+    classification: 'TIER I',
+    date: '1986-12-02',
+    summary:
+      'Subject claims dominion over drainage infrastructure and responds poorly to municipal maps.',
+  },
+  {
+    id: 'NTRI-002',
+    name: 'SOGGY PRINCIPAL',
+    status: 'INDEXED',
+    classification: 'TIER I',
+    date: '1993-04-08',
+    summary:
+      'Enforces unknown school policies in marshland areas. Detention slips are water-resistant.',
+  },
+  {
+    id: 'NTRI-003',
+    name: 'WHISKERED COMPLIANCE',
+    status: 'CONTAINED',
+    classification: 'TIER II',
+    date: '2002-01-29',
+    summary:
+      'Conducts surprise inspections of sealed containers and approves only the least convenient option.',
+  },
+];
+
 const ALL_DOSSIERS: Dossier[] = [
+  ...CORVID_DOSSIERS,
+  ...BULLFROG_DOSSIERS,
   ...DOSSIERS,
+  ...NUTRIA_DOSSIERS,
   PLATYPUS_DOSSIER,
   ...ARTIFACT_DOSSIERS,
 ];
@@ -284,6 +480,62 @@ const ARTIFACTS_DATABASE: CategoryEntry[] = [
     icon: ASSETS.artifactUnflushableBowl,
     dossierId: 'ARTF-006',
   },
+  {
+    id: '07',
+    name: 'FLEXIBLE ELASTOMERIC ISOLATION MEMBRANE',
+    count: 1,
+    icon: ASSETS.artifactIsolationMembrane,
+    dossierId: 'ARTF-007',
+  },
+  {
+    id: '08',
+    name: 'UNAUTHORIZED AUBERGINE',
+    count: 1,
+    icon: ASSETS.artifactUnauthorizedAubergine,
+    dossierId: 'ARTF-008',
+  },
+  {
+    id: '09',
+    name: 'COLD STORAGE UNIT 8',
+    count: 1,
+    icon: ASSETS.artifactColdStorageUnit,
+    dossierId: 'ARTF-009',
+  },
+  {
+    id: '10',
+    name: 'ABSORBENT TEXTILE 6-B',
+    count: 1,
+    icon: ASSETS.artifactAbsorbentTextile,
+    dossierId: 'ARTF-010',
+  },
+  {
+    id: '11',
+    name: 'DISPLACED-IMPACT HAMMER',
+    count: 1,
+    icon: ASSETS.artifactDisplacedImpactHammer,
+    dossierId: 'ARTF-011',
+  },
+  {
+    id: '12',
+    name: 'PATTERNING NAIL CLIPPERS',
+    count: 1,
+    icon: ASSETS.artifactPatterningNailClippers,
+    dossierId: 'ARTF-012',
+  },
+  {
+    id: '13',
+    name: 'INCOMMENSURATE MEASURING STICK',
+    count: 1,
+    icon: ASSETS.artifactIncommensurateMeasuringStick,
+    dossierId: 'ARTF-013',
+  },
+  {
+    id: '14',
+    name: 'PREEMPTIVE TISSUE DISPENSER',
+    count: 1,
+    icon: ASSETS.artifactPreemptiveTissueDispenser,
+    dossierId: 'ARTF-014',
+  },
 ];
 
 const STATUS_LABELS: Record<BayState, string> = {
@@ -302,6 +554,8 @@ const BOOT_FLICKER_DURATION_MS = 1150;
 const BOOT_DISPLAY_DURATION_MS = 1400;
 const BOOT_LOADING_DURATION_MS = 2800;
 const BOOT_GRANTED_DURATION_MS = 1000;
+const RETRIEVAL_MIN_DURATION_MS = 1000;
+const RETRIEVAL_MAX_DURATION_MS = 3000;
 const LAYOUT_STORAGE_KEY = 'dars-1a-layout-adjustments-v2';
 const PROTECTED_LAYOUT_ASSET_IDS = [
   'buttonMenu',
@@ -334,6 +588,8 @@ const LAYOUT_ASSETS = [
   { id: 'doorLower', label: 'Lower Door' },
   { id: 'latch', label: 'Bay Latch' },
   { id: 'shellOuterMask', label: 'Outer Shell Mask' },
+  { id: 'guideLightTop', label: 'Guide Light: Top' },
+  { id: 'guideLightBottom', label: 'Guide Light: Bottom' },
   { id: 'buttonMenu', label: 'Menu Button' },
   { id: 'buttonArchive', label: 'Archive Button' },
   { id: 'buttonBack', label: 'Back Button' },
@@ -416,6 +672,8 @@ const DEFAULT_LAYOUT: LayoutState = {
   doorLower: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   latch: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   shellOuterMask: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  guideLightTop: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
+  guideLightBottom: { x: 0, y: 0, scale: 1, width: 1, height: 1 },
   buttonMenu: { x: -1.923, y: 2.888, scale: 1.44, width: 0.97, height: 1.09 },
   buttonArchive: { x: 6.537, y: 3.609, scale: 1.732, width: 1.03, height: 1.14 },
   buttonBack: { x: 8.46, y: 3.3, scale: 1.849, width: 1.02, height: 1 },
@@ -487,7 +745,9 @@ function App() {
   );
   const [dossierReturnScreen, setDossierReturnScreen] =
     useState<ScreenId>('wombats');
-  const [operatorMessage, setOperatorMessage] = useState<string | null>(null);
+  const [deliveryPhase, setDeliveryPhase] = useState<DeliveryPhase | null>(
+    null,
+  );
   const [pendingNavigation, setPendingNavigation] = useState<ScreenId | null>(
     null,
   );
@@ -506,6 +766,9 @@ function App() {
   const selectedAdjustment = layout[selectedAssetId];
   const selectedDossier =
     ALL_DOSSIERS.find((dossier) => dossier.id === selectedDossierId) ?? null;
+  const isAssetReady = Boolean(selectedDossier);
+  const areGuideLightsActive =
+    bootPhase === 'granted' || bootPhase === 'ready';
   const isProtectedLayoutAsset = PROTECTED_LAYOUT_ASSET_IDS.includes(
     selectedAssetId as (typeof PROTECTED_LAYOUT_ASSET_IDS)[number],
   );
@@ -579,20 +842,6 @@ function App() {
     [layout],
   );
 
-  const openBay = useCallback(() => {
-    if (editMode || bayState !== 'closed') {
-      return;
-    }
-
-    clearTimers();
-    setBayState('unlocking');
-    schedule(() => setBayState('opening'), UNLOCK_DURATION_MS);
-    schedule(
-      () => setBayState('open'),
-      UNLOCK_DURATION_MS + DOOR_DURATION_MS,
-    );
-  }, [bayState, clearTimers, editMode, schedule]);
-
   const closeBay = useCallback(() => {
     if (editMode || bayState !== 'open') {
       return;
@@ -604,6 +853,43 @@ function App() {
     schedule(() => setBayState('closed'), DOOR_DURATION_MS + LOCK_DURATION_MS);
   }, [bayState, clearTimers, editMode, schedule]);
 
+  const beginRetrieval = useCallback(
+    (returnScreen: ScreenId, showDossierScreen: boolean) => {
+      if (bayState !== 'closed') {
+        return;
+      }
+
+      const retrievalDuration =
+        RETRIEVAL_MIN_DURATION_MS +
+        Math.round(
+          Math.random() *
+            (RETRIEVAL_MAX_DURATION_MS - RETRIEVAL_MIN_DURATION_MS),
+        );
+
+      clearTimers();
+      setDossierReturnScreen(returnScreen);
+      setDeliveryPhase('retrieving');
+
+      if (showDossierScreen) {
+        setScreen('dossier');
+      }
+
+      schedule(() => {
+        setDeliveryPhase('retrieved');
+        setBayState('unlocking');
+      }, retrievalDuration);
+      schedule(
+        () => setBayState('opening'),
+        retrievalDuration + UNLOCK_DURATION_MS,
+      );
+      schedule(
+        () => setBayState('open'),
+        retrievalDuration + UNLOCK_DURATION_MS + DOOR_DURATION_MS,
+      );
+    },
+    [bayState, clearTimers, schedule],
+  );
+
   const handleArchive = useCallback(() => {
     if (editMode || isBusy) {
       return;
@@ -611,28 +897,43 @@ function App() {
 
     if (bayState === 'closed') {
       if (!selectedDossier) {
-        setOperatorMessage('SELECT A DOSSIER');
         return;
       }
 
-      setOperatorMessage(null);
-      setScreen('dossier');
-      openBay();
+      beginRetrieval(dossierReturnScreen, dossierReturnScreen !== 'objects');
       return;
     }
 
     if (bayState === 'open') {
-      setOperatorMessage(null);
+      const returnDestination = dossierReturnScreen;
+
+      setDeliveryPhase(null);
+      setSelectedDossierId(null);
+      setDossierReturnScreen('wombats');
+      setScreen(returnDestination);
       closeBay();
     }
-  }, [bayState, closeBay, editMode, isBusy, openBay, selectedDossier]);
+  }, [
+    bayState,
+    beginRetrieval,
+    closeBay,
+    dossierReturnScreen,
+    editMode,
+    isBusy,
+    selectedDossier,
+  ]);
 
   const handleMenu = useCallback(() => {
-    if (editMode || isBusy || pendingNavigation) {
+    if (
+      editMode ||
+      isBusy ||
+      pendingNavigation ||
+      deliveryPhase === 'retrieving'
+    ) {
       return;
     }
 
-    setOperatorMessage(null);
+    setDeliveryPhase(null);
 
     if (bayState === 'open') {
       setPendingNavigation('home');
@@ -641,40 +942,36 @@ function App() {
     }
 
     setScreen('home');
-  }, [bayState, closeBay, editMode, isBusy, pendingNavigation]);
+  }, [bayState, closeBay, deliveryPhase, editMode, isBusy, pendingNavigation]);
 
   const openDossier = useCallback((id: string) => {
     if (isBusy) {
       return;
     }
 
-    setOperatorMessage(null);
-    setDossierReturnScreen('wombats');
+    setDossierReturnScreen(getDossierRegistryScreen(id));
+    setDeliveryPhase(null);
     setSelectedDossierId(id);
-    setScreen('dossier');
   }, [isBusy]);
 
   const deliverDossier = useCallback(
-    (id: string, returnScreen: ScreenId) => {
+    (id: string, returnScreen: ScreenId, showDossierScreen = true) => {
       if (editMode || isBusy || pendingNavigation) {
         return;
       }
 
       if (!ALL_DOSSIERS.some((dossier) => dossier.id === id)) {
-        setOperatorMessage('DOSSIER NOT FOUND');
         return;
       }
 
-      setOperatorMessage(null);
       setDossierReturnScreen(returnScreen);
       setSelectedDossierId(id);
-      setScreen('dossier');
 
-      if (bayState === 'closed') {
-        openBay();
+      if (showDossierScreen) {
+        setScreen('dossier');
       }
     },
-    [bayState, editMode, isBusy, openBay, pendingNavigation],
+    [editMode, isBusy, pendingNavigation],
   );
 
   const navigateToScreen = useCallback(
@@ -683,7 +980,9 @@ function App() {
         return;
       }
 
-      setOperatorMessage(null);
+      setDeliveryPhase(null);
+      setSelectedDossierId(null);
+      setDossierReturnScreen('wombats');
       setScreen(nextScreen);
     },
     [editMode, isBusy, pendingNavigation],
@@ -694,7 +993,13 @@ function App() {
       return dossierReturnScreen;
     }
 
-    if (currentScreen === 'wombats') {
+    if (
+      currentScreen === 'corvids' ||
+      currentScreen === 'bullfrogs' ||
+      currentScreen === 'wombats' ||
+      currentScreen === 'nutrias' ||
+      currentScreen === 'platypus'
+    ) {
       return 'species';
     }
 
@@ -711,22 +1016,35 @@ function App() {
   }, [dossierReturnScreen]);
 
   const handleBack = useCallback(() => {
-    if (editMode || isBusy || pendingNavigation) {
+    if (
+      editMode ||
+      isBusy ||
+      pendingNavigation ||
+      deliveryPhase === 'retrieving'
+    ) {
       return;
     }
 
-    setOperatorMessage(null);
+    setDeliveryPhase(null);
 
     if (bayState === 'open') {
-      setPendingNavigation(getBackDestination(screen));
+      const returnDestination = dossierReturnScreen;
+
+      setDeliveryPhase(null);
+      setSelectedDossierId(null);
+      setDossierReturnScreen('wombats');
+      setScreen(returnDestination);
       closeBay();
       return;
     }
 
+    setSelectedDossierId(null);
+    setDossierReturnScreen('wombats');
     setScreen((currentScreen) => getBackDestination(currentScreen));
   }, [
     bayState,
     closeBay,
+    deliveryPhase,
     editMode,
     getBackDestination,
     isBusy,
@@ -982,8 +1300,11 @@ function App() {
       return;
     }
 
+    setDeliveryPhase(null);
     setScreen(pendingNavigation);
     setPendingNavigation(null);
+    setSelectedDossierId(null);
+    setDossierReturnScreen('wombats');
   }, [bayState, pendingNavigation]);
 
   useEffect(() => {
@@ -1159,7 +1480,7 @@ function App() {
             className="control-button"
             type="button"
             onClick={handleArchive}
-            disabled={isBusy || editMode}
+            disabled={isBusy || editMode || deliveryPhase === 'retrieving'}
           >
             {bayState === 'open' ? 'Close Bay' : 'Open Bay'}
           </button>
@@ -1356,7 +1677,7 @@ function App() {
                     dossiers={DOSSIERS}
                     selectedDossierId={selectedDossierId}
                     selectedDossier={selectedDossier}
-                    operatorMessage={operatorMessage}
+                    deliveryPhase={deliveryPhase}
                     getOffsetStyle={getOffsetStyle}
                     getScaleStyle={getScaleStyle}
                     setLayoutNode={setLayoutNode}
@@ -1366,7 +1687,7 @@ function App() {
                     onSelectObjects={() => navigateToScreen('objects')}
                     onSelectEvents={() => navigateToScreen('events')}
                     onSelectAnomalies={() => navigateToScreen('anomalies')}
-                    onOpenWombats={() => navigateToScreen('wombats')}
+                    onOpenSpeciesRegistry={navigateToScreen}
                     onOpenDossier={openDossier}
                     onDeliverDossier={deliverDossier}
                   />
@@ -1485,13 +1806,47 @@ function App() {
             passive
           />
 
+          <DeviceLayer
+            assetId="guideLightTop"
+            className="layout-offset--guide-light"
+            getOffsetStyle={getOffsetStyle}
+          >
+            <span
+              ref={(node) => setLayoutNode('guideLightTop', node)}
+              className={`shell-guide-light shell-guide-light--top layout-editable${
+                areGuideLightsActive ? ' shell-guide-light--active' : ''
+              }`}
+              style={getScaleStyle('guideLightTop')}
+              data-layout-id="guideLightTop"
+              aria-hidden="true"
+              onPointerDown={(event) => beginMove(event, 'guideLightTop')}
+            />
+          </DeviceLayer>
+
+          <DeviceLayer
+            assetId="guideLightBottom"
+            className="layout-offset--guide-light"
+            getOffsetStyle={getOffsetStyle}
+          >
+            <span
+              ref={(node) => setLayoutNode('guideLightBottom', node)}
+              className={`shell-guide-light shell-guide-light--bottom layout-editable${
+                areGuideLightsActive ? ' shell-guide-light--active' : ''
+              }`}
+              style={getScaleStyle('guideLightBottom')}
+              data-layout-id="guideLightBottom"
+              aria-hidden="true"
+              onPointerDown={(event) => beginMove(event, 'guideLightBottom')}
+            />
+          </DeviceLayer>
+
           <DeviceButton
             assetId="buttonMenu"
             wrapperClassName="layout-offset--button-menu"
             className="device-button--menu"
             label="Menu"
             imgSrc={ASSETS.buttonMenu}
-            disabled={!editMode && isBusy}
+            disabled={!editMode && (isBusy || deliveryPhase === 'retrieving')}
             getOffsetStyle={getOffsetStyle}
             getScaleStyle={getScaleStyle}
             setLayoutNode={setLayoutNode}
@@ -1504,7 +1859,9 @@ function App() {
           <DeviceButton
             assetId="buttonArchive"
             wrapperClassName="layout-offset--button-archive"
-            className="device-button--archive"
+            className={`device-button--archive${
+              isAssetReady ? ' device-button--ready' : ''
+            }`}
             label={
               editMode
                 ? 'Archive button layout asset'
@@ -1513,7 +1870,7 @@ function App() {
                   : 'Open archive retrieval bay'
             }
             imgSrc={ASSETS.buttonArchive}
-            disabled={!editMode && isBusy}
+            disabled={!editMode && (isBusy || deliveryPhase === 'retrieving')}
             getOffsetStyle={getOffsetStyle}
             getScaleStyle={getScaleStyle}
             setLayoutNode={setLayoutNode}
@@ -1529,7 +1886,7 @@ function App() {
             className="device-button--back"
             label="Back"
             imgSrc={ASSETS.buttonBack}
-            disabled={!editMode && isBusy}
+            disabled={!editMode && (isBusy || deliveryPhase === 'retrieving')}
             getOffsetStyle={getOffsetStyle}
             getScaleStyle={getScaleStyle}
             setLayoutNode={setLayoutNode}
@@ -1841,32 +2198,115 @@ function DeviceButton({
   );
 }
 
-function getCrtTitle(screen: ScreenId): string {
-  if (screen === 'home') {
-    return 'DARS Interface';
+function getRegistryTitle(screen: ScreenId): string {
+  if (screen === 'corvids') {
+    return 'CORVID RECORDS';
   }
 
-  if (screen === 'species') {
-    return 'Select Species Type';
-  }
-
-  if (screen === 'objects') {
-    return 'Artifacts Database';
-  }
-
-  if (screen === 'events') {
-    return 'Select Events Type';
-  }
-
-  if (screen === 'anomalies') {
-    return 'Select Anomalies Type';
+  if (screen === 'bullfrogs') {
+    return 'BULLFROG RECORDS';
   }
 
   if (screen === 'wombats' || screen === 'dossier') {
-    return 'Wombat Records';
+    return 'WOMBAT RECORDS';
   }
 
-  return 'Select Dossier Type';
+  if (screen === 'nutrias') {
+    return 'NUTRIA RECORDS';
+  }
+
+  if (screen === 'platypus') {
+    return 'PLATYPUS RECORDS';
+  }
+
+  return 'SPECIES RECORDS';
+}
+
+function getRegistryRecordName(dossier: Dossier): string {
+  const normalizedName = dossier.name
+    .replace(/^WOMBAT SPECIMEN\s*/i, 'Wombat Specimen ')
+    .replace(/^PLATYPUS SPECIMEN\s*/i, 'Platypus Specimen ')
+    .replace(/^THE\s+/i, 'The ');
+
+  return normalizedName
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getDispensedIconSrc(dossierId: string | null | undefined): string {
+  if (!dossierId) {
+    return ASSETS.recordIcon;
+  }
+
+  if (dossierId.startsWith('CRVD-')) {
+    return ASSETS.corvidDispensedIcon;
+  }
+
+  if (dossierId.startsWith('BFRG-')) {
+    return ASSETS.bullfrogDispensedIcon;
+  }
+
+  if (dossierId.startsWith('WMBT-')) {
+    return ASSETS.wombatDispensedIcon;
+  }
+
+  if (dossierId.startsWith('NTRI-')) {
+    return ASSETS.nutriaDispensedIcon;
+  }
+
+  if (dossierId.startsWith('PLTY-')) {
+    return ASSETS.platypusDispensedIcon;
+  }
+
+  const artifactIcon = ARTIFACTS_DATABASE.find(
+    (entry) => entry.dossierId === dossierId,
+  )?.icon;
+
+  return artifactIcon ?? ASSETS.recordIcon;
+}
+
+function getDossierRegistryScreen(dossierId: string): ScreenId {
+  if (dossierId.startsWith('CRVD-')) {
+    return 'corvids';
+  }
+
+  if (dossierId.startsWith('BFRG-')) {
+    return 'bullfrogs';
+  }
+
+  if (dossierId.startsWith('NTRI-')) {
+    return 'nutrias';
+  }
+
+  if (dossierId.startsWith('PLTY-')) {
+    return 'platypus';
+  }
+
+  if (dossierId.startsWith('ARTF-')) {
+    return 'objects';
+  }
+
+  return 'wombats';
+}
+
+function getRegistryDossiers(screen: ScreenId, fallbackDossiers: Dossier[]) {
+  if (screen === 'corvids') {
+    return CORVID_DOSSIERS;
+  }
+
+  if (screen === 'bullfrogs') {
+    return BULLFROG_DOSSIERS;
+  }
+
+  if (screen === 'nutrias') {
+    return NUTRIA_DOSSIERS;
+  }
+
+  if (screen === 'platypus') {
+    return [PLATYPUS_DOSSIER];
+  }
+
+  return fallbackDossiers;
 }
 
 function DossierBrowser({
@@ -1874,7 +2314,7 @@ function DossierBrowser({
   dossiers,
   selectedDossierId,
   selectedDossier,
-  operatorMessage,
+  deliveryPhase,
   getOffsetStyle,
   getScaleStyle,
   setLayoutNode,
@@ -1884,7 +2324,7 @@ function DossierBrowser({
   onSelectObjects,
   onSelectEvents,
   onSelectAnomalies,
-  onOpenWombats,
+  onOpenSpeciesRegistry,
   onOpenDossier,
   onDeliverDossier,
 }: {
@@ -1892,7 +2332,7 @@ function DossierBrowser({
   dossiers: Dossier[];
   selectedDossierId: string | null;
   selectedDossier: Dossier | null;
-  operatorMessage: string | null;
+  deliveryPhase: DeliveryPhase | null;
   getOffsetStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
   getScaleStyle: (assetId: LayoutAssetId) => LayoutCssProperties;
   setLayoutNode: (assetId: LayoutAssetId, node: HTMLElement | null) => void;
@@ -1905,10 +2345,24 @@ function DossierBrowser({
   onSelectObjects: () => void;
   onSelectEvents: () => void;
   onSelectAnomalies: () => void;
-  onOpenWombats: () => void;
+  onOpenSpeciesRegistry: (screen: ScreenId) => void;
   onOpenDossier: (id: string) => void;
-  onDeliverDossier: (id: string, returnScreen: ScreenId) => void;
+  onDeliverDossier: (
+    id: string,
+    returnScreen: ScreenId,
+    showDossierScreen?: boolean,
+  ) => void;
 }) {
+  if (deliveryPhase) {
+    return (
+      <AssetRetrievalScreen
+        phase={deliveryPhase}
+        assetName={selectedDossier?.name ?? 'SELECTED ASSET'}
+        dispensedIconSrc={getDispensedIconSrc(selectedDossier?.id)}
+      />
+    );
+  }
+
   if (screen === 'home') {
     return (
       <div className="crt-browser crt-main-menu">
@@ -2014,9 +2468,10 @@ function DossierBrowser({
       <CategoryDatabase
         category="SPECIES"
         entries={SPECIES_DATABASE}
+        selectedDossierId={selectedDossierId}
         onSelectEntry={(entry) => {
-          if (entry.target === 'wombats') {
-            onOpenWombats();
+          if (entry.target) {
+            onOpenSpeciesRegistry(entry.target);
             return;
           }
 
@@ -2033,9 +2488,11 @@ function DossierBrowser({
       <CategoryDatabase
         category="ARTIFACT"
         entries={ARTIFACTS_DATABASE}
+        selectedDossierId={selectedDossierId}
+        showRecordCount={false}
         onSelectEntry={(entry) => {
           if (entry.dossierId) {
-            onDeliverDossier(entry.dossierId, 'objects');
+            onDeliverDossier(entry.dossierId, 'objects', false);
           }
         }}
       />
@@ -2047,96 +2504,82 @@ function DossierBrowser({
   }
 
   return (
-    <div className="crt-browser">
-      <CrtEditableBlock
-        assetId="crtTitleLine"
-        className="crt-title-line"
-        getOffsetStyle={getOffsetStyle}
-        getScaleStyle={getScaleStyle}
-        setLayoutNode={setLayoutNode}
-        beginMove={beginMove}
-      >
-        <span className="crt-title-chevrons crt-title-chevrons--left" aria-hidden="true">
-          <i />
-          <i />
-        </span>
-        <strong>{operatorMessage ?? getCrtTitle(screen)}</strong>
-        <span className="crt-title-chevrons crt-title-chevrons--right" aria-hidden="true">
-          <i />
-          <i />
-        </span>
-      </CrtEditableBlock>
+    <SpeciesRegistryScreen
+      screen={screen}
+      dossiers={getRegistryDossiers(screen, dossiers)}
+      selectedDossierId={selectedDossierId}
+      onOpenDossier={onOpenDossier}
+    />
+  );
+}
 
-      <CrtEditableBlock
-        assetId="crtLeftPanel"
-        className="crt-panel crt-panel--left"
-        getOffsetStyle={getOffsetStyle}
-        getScaleStyle={getScaleStyle}
-        setLayoutNode={setLayoutNode}
-        beginMove={beginMove}
-      >
-        {(screen === 'wombats' || screen === 'dossier') ? (
-          <div className="crt-panel-actions crt-panel-actions--records">
-            {dossiers.map((dossier) => (
-              <button
-                key={dossier.id}
-                type="button"
-                className={
-                  dossier.id === selectedDossierId ? 'is-selected' : undefined
-                }
-                onClick={() => onOpenDossier(dossier.id)}
-              >
+function SpeciesRegistryScreen({
+  screen,
+  dossiers,
+  selectedDossierId,
+  onOpenDossier,
+}: {
+  screen: ScreenId;
+  dossiers: Dossier[];
+  selectedDossierId: string | null;
+  onOpenDossier: (id: string) => void;
+}) {
+  return (
+    <div className="crt-browser crt-database crt-record-browser">
+      <div className="crt-db-title">
+        <span
+          className="crt-title-chevrons crt-title-chevrons--left"
+          aria-hidden="true"
+        >
+          <i />
+          <i />
+        </span>
+        <strong>{getRegistryTitle(screen)}</strong>
+        <span
+          className="crt-title-chevrons crt-title-chevrons--right"
+          aria-hidden="true"
+        >
+          <i />
+          <i />
+        </span>
+      </div>
+
+      <div className="crt-db-head crt-record-browser__head">
+        <span />
+        <span>ID</span>
+        <span>DESIGNATION</span>
+      </div>
+
+      <div className="crt-db-list crt-record-browser__list">
+        {dossiers.map((dossier) => {
+          const isSelected = dossier.id === selectedDossierId;
+
+          return (
+            <button
+              key={dossier.id}
+              type="button"
+              className={`crt-db-row${isSelected ? ' is-selected' : ''}`}
+              onClick={() => onOpenDossier(dossier.id)}
+            >
+              <span className="crt-db-row__icon" aria-hidden="true">
                 <img
-                  className="crt-btn-icon"
+                  className="crt-db-row__species-icon crt-record-browser__icon"
                   src={ASSETS.recordIcon}
                   alt=""
-                  aria-hidden="true"
                   draggable="false"
                 />
-                {dossier.id}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </CrtEditableBlock>
-
-      <CrtEditableBlock
-        assetId="crtRightTopPanel"
-        className="crt-panel crt-panel--right-top"
-        getOffsetStyle={getOffsetStyle}
-        getScaleStyle={getScaleStyle}
-        setLayoutNode={setLayoutNode}
-        beginMove={beginMove}
-      >
-        <div className="crt-panel-list">
-          {screen === 'wombats' || screen === 'dossier'
-            ? dossiers.slice(0, 6).map((dossier) => (
-                <span key={dossier.id}>{dossier.id}</span>
-              ))
-            : null}
-        </div>
-      </CrtEditableBlock>
-
-      <CrtEditableBlock
-        assetId="crtRightBottomPanel"
-        className="crt-panel crt-panel--right-bottom"
-        getOffsetStyle={getOffsetStyle}
-        getScaleStyle={getScaleStyle}
-        setLayoutNode={setLayoutNode}
-        beginMove={beginMove}
-      >
-        {selectedDossier ? (
-          <div className="crt-panel-record">
-            <strong>{selectedDossier.id}</strong>
-            <span>{selectedDossier.name}</span>
-            <span>{selectedDossier.classification}</span>
-          </div>
-        ) : (
-          <div className="crt-panel-message">
-            {operatorMessage ?? 'NO RECORD SELECTED'}
-          </div>
-        )}
-      </CrtEditableBlock>
+              </span>
+              <span className="crt-record-browser__copy">
+                <strong>
+                  {isSelected ? '>' : ''}
+                  {dossier.id}
+                </strong>
+                <span>{getRegistryRecordName(dossier)}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -2145,6 +2588,47 @@ function RestrictedScreen() {
   return (
     <div className="crt-browser crt-restricted-screen">
       <div className="crt-restricted-message">RESTRICTED</div>
+    </div>
+  );
+}
+
+function AssetRetrievalScreen({
+  phase,
+  assetName,
+  dispensedIconSrc,
+}: {
+  phase: DeliveryPhase;
+  assetName: string;
+  dispensedIconSrc: string;
+}) {
+  if (phase === 'retrieved') {
+    return (
+      <div className="crt-browser crt-asset-status crt-asset-status--dispensed">
+        <img
+          className="crt-asset-status__icon crt-asset-status__icon--dispensed"
+          src={dispensedIconSrc}
+          alt=""
+          aria-hidden="true"
+          draggable="false"
+        />
+        <strong>DOSSIER DISPENSED</strong>
+        <span>Please Remove From Bay</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="crt-browser crt-asset-status">
+      <div className="crt-asset-status__panel">
+        <strong>ACCESS GRANTED</strong>
+        <em>Retrieving Record</em>
+        <span>{assetName}</span>
+        <div className="crt-asset-status__bar" aria-hidden="true">
+          {Array.from({ length: 16 }, (_, index) => (
+            <i key={index} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -2257,19 +2741,22 @@ function pad3(value: number): string {
 function CategoryDatabase({
   category,
   entries,
+  selectedDossierId,
+  showRecordCount = true,
   onSelectEntry,
 }: {
   category: string;
   entries: CategoryEntry[];
+  selectedDossierId?: string | null;
+  showRecordCount?: boolean;
   onSelectEntry: (entry: CategoryEntry) => void;
 }) {
-  const totalRecords = entries.reduce(
-    (sum, entry) => (entry.locked ? sum : sum + entry.count),
-    0,
-  );
-
   return (
-    <div className="crt-browser crt-database">
+    <div
+      className={`crt-browser crt-database${
+        showRecordCount ? '' : ' crt-database--no-count'
+      }`}
+    >
       <div className="crt-db-title">
         <span
           className="crt-title-chevrons crt-title-chevrons--left"
@@ -2289,9 +2776,11 @@ function CategoryDatabase({
       </div>
 
       <div className="crt-db-head">
+        <span />
         <span>ID</span>
-        <span>{category} CATEGORY</span>
-        <span>TOTAL RECORDS: {pad3(totalRecords)}</span>
+        <span>{category}</span>
+        <span>{showRecordCount ? 'RECORD COUNT' : ''}</span>
+        <span />
       </div>
 
       <div className="crt-db-list">
@@ -2299,7 +2788,9 @@ function CategoryDatabase({
           <button
             key={entry.id}
             type="button"
-            className={`crt-db-row${entry.locked ? ' crt-db-row--locked' : ''}`}
+            className={`crt-db-row${
+              entry.locked ? ' crt-db-row--locked' : ''
+            }${entry.dossierId === selectedDossierId ? ' is-selected' : ''}`}
             onClick={() => onSelectEntry(entry)}
             disabled={entry.locked}
           >
@@ -2335,10 +2826,14 @@ function CategoryDatabase({
             <span className="crt-db-row__id">{entry.id}</span>
             <span className="crt-db-row__name">{entry.name}</span>
             <span className="crt-db-row__count">
-              {entry.locked ? 'REDACTED' : pad3(entry.count)}
+              {showRecordCount
+                ? entry.locked
+                  ? 'REDACTED'
+                  : pad3(entry.count)
+                : ''}
             </span>
             <span className="crt-db-row__arrow" aria-hidden="true">
-              ›
+              &gt;
             </span>
           </button>
         ))}
@@ -2429,3 +2924,4 @@ function BootScreen({
 }
 
 export default App;
+
